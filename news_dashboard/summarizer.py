@@ -27,28 +27,28 @@ def _get_model() -> SentenceTransformer:
 # ──────────────────────────────────────────────
 # Headline: most representative title
 # ──────────────────────────────────────────────
-def _pick_headline(cluster: list[dict]) -> str:
+def _pick_headline(cluster: list[dict]) -> tuple[str, str]:
     """
     Choose the title whose embedding is closest to the cluster centroid.
-    Falls back to the first title if embedding fails.
+    Returns (headline, url).
     """
     if len(cluster) == 1:
-        return cluster[0]["title"]
+        return cluster[0]["title"], cluster[0]["url"]
 
     try:
         model = _get_model()
         titles = [a["title"] for a in cluster]
+        urls = [a["url"] for a in cluster]
         embeddings = model.encode(titles, show_progress_bar=False)
         centroid = np.mean(embeddings, axis=0)
-        # Cosine similarity to centroid
         sims = embeddings @ centroid / (
             np.linalg.norm(embeddings, axis=1) * np.linalg.norm(centroid) + 1e-9
         )
         best_idx = int(np.argmax(sims))
-        return titles[best_idx]
+        return titles[best_idx], urls[best_idx]
     except Exception:
         logger.warning("Headline selection via embeddings failed; using first title")
-        return cluster[0]["title"]
+        return cluster[0]["title"], cluster[0]["url"]
 
 
 # ──────────────────────────────────────────────
@@ -102,7 +102,7 @@ def summarize_stories(ranked_stories: list[dict]) -> list[dict]:
     results: list[dict] = []
     for story in ranked_stories:
         cluster = story["cluster"]
-        headline = _pick_headline(cluster)
+        headline, url = _pick_headline(cluster)
         summary = _make_summary(cluster)
         why = _why_it_matters(cluster)
 
@@ -111,6 +111,7 @@ def summarize_stories(ranked_stories: list[dict]) -> list[dict]:
                 "headline": headline,
                 "summary": summary,
                 "why_it_matters": why,
+                "url": url,
                 "score": story["score"],
                 "article_count": story["article_count"],
                 "sources": story["sources"],

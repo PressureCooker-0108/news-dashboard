@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS stories (
     headline        TEXT NOT NULL,
     summary         TEXT,
     why_it_matters  TEXT,
+    url             TEXT,
     score           REAL,
     article_count   INTEGER,
     sources         TEXT,
@@ -134,13 +135,14 @@ def save_stories(stories: list[dict]) -> None:
         conn.execute(
             """
             INSERT INTO stories
-                (headline, summary, why_it_matters, score, article_count, sources, latest_at, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                (headline, summary, why_it_matters, url, score, article_count, sources, latest_at, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 s["headline"],
                 s["summary"],
                 s["why_it_matters"],
+                s.get("url"),
                 s["score"],
                 s["article_count"],
                 ",".join(s.get("sources", [])),

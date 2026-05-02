@@ -74,7 +74,7 @@ def health_check():
 
 
 @app.get("/news")
-def get_news(limit: int = Query(default=10, ge=1, le=20)):
+def get_news(limit: int = Query(default=20, ge=1, le=50)):
     """Return top-ranked news stories."""
     stories = get_top_stories(limit=limit)
     if not stories:
@@ -98,6 +98,7 @@ def get_news(limit: int = Query(default=10, ge=1, le=20)):
                 "headline": s["headline"],
                 "summary": s["summary"],
                 "why_it_matters": s["why_it_matters"],
+                "url": s.get("url"),
                 "sources": sources,
                 "article_count": s["article_count"],
                 "score": s["score"],
