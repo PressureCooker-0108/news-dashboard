@@ -2,12 +2,14 @@
 Serious Operator News Dashboard — FastAPI application.
 """
 
+import json
 import logging
 import threading
 from contextlib import asynccontextmanager
 from typing import Optional
 
 from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
 
 from .database import init_db, get_top_stories, story_count, last_updated
 from .scheduler import run_pipeline, start_scheduler
@@ -49,6 +51,14 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # ──────────────────────────────────────────────
 # Routes
@@ -76,13 +86,19 @@ def get_news(limit: int = Query(default=10, ge=1, le=20)):
 
     result = []
     for rank, s in enumerate(stories, start=1):
+        sources = s["sources"]
+        if isinstance(sources, str):
+            try:
+                sources = json.loads(sources)
+            except (json.JSONDecodeError, ValueError):
+                sources = [sources]
         result.append(
             {
                 "rank": rank,
                 "headline": s["headline"],
                 "summary": s["summary"],
                 "why_it_matters": s["why_it_matters"],
-                "sources": s["sources"],
+                "sources": sources,
                 "article_count": s["article_count"],
                 "score": s["score"],
                 "latest_at": s.get("latest_at"),
@@ -90,3 +106,26 @@ def get_news(limit: int = Query(default=10, ge=1, le=20)):
         )
 
     return {"count": len(result), "stories": result}
+
+
+@app.get("/news/raw")
+def get_news_raw(limit: int = Query(default=10, ge=1, le=20)):
+    """Flat, minimal story list — optimised for frontend consumption."""
+    stories = get_top_stories(limit=limit)
+    if not stories:
+        return []
+    result = []
+    for s in stories:
+        sources = s["sources"]
+        if isinstance(sources, str):
+            try:
+                sources = json.loads(sources)
+            except Exception:
+                sources = [sources]
+        result.append({
+            "headline": s["headline"],
+            "summary": s["summary"],
+            "why_it_matters": s["why_it_matters"],
+            "sources": sources,
+        })
+    return result

@@ -7,21 +7,26 @@ RSS feeds, constants, and topic templates.
 # RSS Feed Sources
 # ──────────────────────────────────────────────
 RSS_FEEDS = [
-    "http://feeds.reuters.com/reuters/topNews",
-    "http://feeds.reuters.com/reuters/businessNews",
+    # Global News
     "https://feeds.bbci.co.uk/news/rss.xml",
     "https://feeds.bbci.co.uk/news/world/rss.xml",
     "https://www.aljazeera.com/xml/rss/all.xml",
     "https://feeds.npr.org/1001/rss.xml",
     "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
     "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
-    "https://feeds.a.dz.com/rss/cnbc/world",
+    # Business & Markets
+    "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114",
+    "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664",
+    "https://feeds.marketwatch.com/marketwatch/topstories/",
+    "https://www.investing.com/rss/news.rss",
+    # Tech
     "https://techcrunch.com/feed/",
     "https://news.ycombinator.com/rss",
+    "https://www.wired.com/feed/rss",
+    # India
     "https://www.thehindu.com/news/international/?service=rss",
     "https://feeds.feedburner.com/ndtvnews-top-stories",
-    "https://rss.app/feeds/tvYaGCRLkyd3oZHC.xml",
-    "https://www.ft.com/rss/home",
+    "https://timesofindia.indiatimes.com/rss/4719148.cms",
 ]
 
 # ──────────────────────────────────────────────
