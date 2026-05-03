@@ -54,5 +54,5 @@ TOPIC_TEMPLATES = {
     "market": "Market movements reflect investor confidence and can signal broader economic trends.",
     "health": "Health crises affect workforce productivity, government spending, and supply chains.",
     "trade": "Trade policy changes affect prices, jobs, and international relations.",
-    "default": "This story is receiving significant coverage across multiple major news sources.",
+    "default": "This is a developing story worth monitoring.",
 }

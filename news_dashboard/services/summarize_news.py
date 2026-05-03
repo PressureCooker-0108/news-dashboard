@@ -35,13 +35,13 @@ def _make_summary(cluster: list[dict]) -> str:
     """Concatenate snippets and truncate."""
     snippets = [a.get("content_snippet", "") for a in cluster if a.get("content_snippet")]
     if not snippets:
-        return "No summary available."
+        return "Details are still emerging."
     combined = " ".join(snippets[:2]).strip()
     sentences = _SENTENCE_RE.split(combined)
     summary = ". ".join(s.strip() for s in sentences[:2] if s.strip())
     if summary and not summary.endswith("."):
         summary += "."
-    return summary or "No summary available."
+    return summary or "Details are still emerging."
 
 def _why_it_matters(cluster: list[dict]) -> str:
     """Keyword based matching."""
