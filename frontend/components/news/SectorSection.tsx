@@ -5,37 +5,27 @@ interface SectorSectionProps {
 }
 
 export function SectorSection({ stories }: SectorSectionProps) {
-  // Simple keyword-based categorization for the MVP
+  // Use backend-provided sectors instead of keyword guessing
   const categorize = (items: Story[]) => {
-    const sectors = {
-      Markets: [] as Story[],
-      Tech: [] as Story[],
-      Geopolitics: [] as Story[],
-      General: [] as Story[]
-    }
-
-    const techKeywords = ['tech', 'ai', 'semiconductor', 'chip', 'apple', 'google', 'microsoft', 'software', 'digital', 'cyber']
-    const marketKeywords = ['market', 'stock', 'invest', 'economy', 'fed', 'rate', 'inflation', 'bank', 'finance', 'trading', 'oil']
-    const geoKeywords = ['war', 'conflict', 'diplomacy', 'election', 'minister', 'president', 'china', 'russia', 'ukraine', 'israel', 'lebanon', 'nato', 'un']
+    const sectorMap: Record<string, Story[]> = {}
 
     items.forEach(story => {
-      const text = (story.headline + ' ' + story.summary).toLowerCase()
-      if (techKeywords.some(k => text.includes(k))) sectors.Tech.push(story)
-      else if (marketKeywords.some(k => text.includes(k))) sectors.Markets.push(story)
-      else if (geoKeywords.some(k => text.includes(k))) sectors.Geopolitics.push(story)
-      else sectors.General.push(story)
+      const sectors = story.sectors || ["General"]
+      sectors.forEach(sector => {
+        if (!sectorMap[sector]) sectorMap[sector] = []
+        sectorMap[sector].push(story)
+      })
     })
 
-    // Fallback: If sectors are empty, fill them with General stories to ensure UI is populated
-    if (sectors.Markets.length === 0) sectors.Markets = sectors.General.splice(0, 3)
-    if (sectors.Tech.length === 0) sectors.Tech = sectors.General.splice(0, 3)
-    if (sectors.Geopolitics.length === 0) sectors.Geopolitics = sectors.General.splice(0, 3)
-
-    return [
-      { name: "Markets", items: sectors.Markets.slice(0, 4) },
-      { name: "Tech", items: sectors.Tech.slice(0, 4) },
-      { name: "Geopolitics", items: sectors.Geopolitics.slice(0, 4) }
-    ]
+    // Priority order for display
+    const displayOrder = ["Markets", "Tech", "Geopolitics", "Energy", "India", "General"]
+    
+    return displayOrder
+      .filter(name => sectorMap[name] && sectorMap[name].length > 0)
+      .map(name => ({
+        name,
+        items: sectorMap[name].slice(0, 4)
+      }))
   }
 
   const sections = categorize(stories)

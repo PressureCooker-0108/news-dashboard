@@ -3,4 +3,5 @@ export interface Story {
   summary: string
   why_it_matters: string
   url?: string
+  sectors?: string[]
 }

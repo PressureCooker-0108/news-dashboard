@@ -38,7 +38,7 @@ RECENCY_WEIGHT = 0.4
 COVERAGE_WEIGHT = 0.6
 
 # Database
-DATABASE_PATH = "news.db"
+# Migration to Supabase complete.
 
 # ──────────────────────────────────────────────
 # Topic → "Why It Matters" Templates
