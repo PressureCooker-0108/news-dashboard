@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+python-dotenv
+feedparser
+sentence-transformers
+numpy
+apscheduler
+python-dateutil
+httpx

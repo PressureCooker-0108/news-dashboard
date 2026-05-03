@@ -9,8 +9,8 @@ from typing import Optional
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from .models.database import init_db, get_top_stories, story_count, last_updated
-from .scheduler import run_pipeline, start_scheduler
+from models.database import init_db, get_top_stories, story_count, last_updated
+from scheduler import run_pipeline, start_scheduler
 
 # Global Safety Flag
 USE_AI = False
@@ -149,5 +149,5 @@ def get_news_raw(limit: int = Query(default=10, ge=1, le=20)):
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8001))
-    uvicorn.run("news_dashboard.main:app", host="0.0.0.0", port=port)
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
 
