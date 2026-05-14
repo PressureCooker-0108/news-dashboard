@@ -24,6 +24,7 @@ from services.pdf_briefing import generate_pdf_briefing
 # ── Logging ──
 # Structured JSON logging with loguru. Logs go to stdout (captured by Docker/Render)
 # and to a rotating file for local debugging.
+os.makedirs("logs", exist_ok=True)
 loguru_logger.remove()  # Remove default handler
 loguru_logger.add(
     sink=lambda msg: print(msg, end=""),

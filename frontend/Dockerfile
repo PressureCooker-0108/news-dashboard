@@ -15,12 +15,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install deps (cached layer)
+# Install all deps (including devDeps needed for build)
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production && npm cache clean --force
-
-# Also install dev deps for the build
-RUN npm ci
+RUN npm ci && npm cache clean --force
 
 # Copy source
 COPY . .

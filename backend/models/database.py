@@ -7,12 +7,22 @@ from sqlalchemy.orm import Session, sessionmaker
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if DATABASE_URL:
-    engine = create_engine(
-        DATABASE_URL,
-        pool_size=5,
-        max_overflow=10,
-        connect_args={"sslmode": "require"},
-    )
+    # sslmode=require is needed for Supabase and Render Postgres, but NOT for
+    # local Docker Postgres (no SSL). Only add it if the URL doesn't already
+    # specify sslmode and isn't connecting to localhost.
+    if "sslmode" not in DATABASE_URL and "localhost" not in DATABASE_URL and "127.0.0.1" not in DATABASE_URL:
+        engine = create_engine(
+            DATABASE_URL,
+            pool_size=5,
+            max_overflow=10,
+            connect_args={"sslmode": "require"},
+        )
+    else:
+        engine = create_engine(
+            DATABASE_URL,
+            pool_size=5,
+            max_overflow=10,
+        )
 else:
     engine = create_engine(
         "sqlite:///news.db",
