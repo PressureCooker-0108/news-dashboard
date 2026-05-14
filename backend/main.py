@@ -1,12 +1,15 @@
-import logging
+import os
 import threading
 import json
+import time
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
-from fastapi import FastAPI, Query
+
+from fastapi import FastAPI, Query, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse, StreamingResponse
+from loguru import logger as loguru_logger
 
 from models.database import (
     init_db, get_top_stories, story_count, last_updated,
@@ -18,15 +21,84 @@ from services.market_data import fetch_and_store_market_data, get_big_market_mov
 from services.briefing import generate_briefing
 from services.pdf_briefing import generate_pdf_briefing
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
-logger = logging.getLogger(__name__)
+# ── Logging ──
+# Structured JSON logging with loguru. Logs go to stdout (captured by Docker/Render)
+# and to a rotating file for local debugging.
+loguru_logger.remove()  # Remove default handler
+loguru_logger.add(
+    sink=lambda msg: print(msg, end=""),
+    format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level:<8}</level> | <cyan>{name}</cyan> | <level>{message}</level>",
+    colorize=True,
+    level=os.environ.get("LOG_LEVEL", "INFO"),
+)
+# Also write to rotating file (10 MB per file, keep 3)
+loguru_logger.add(
+    "logs/pipeline.log",
+    rotation="10 MB",
+    retention=3,
+    format="{time:YYYY-MM-DD HH:mm:ss} | {level:<8} | {name} | {message}",
+    level="DEBUG",
+    enqueue=True,
+)
+logger = loguru_logger
 
 # ── Cache ──
 _news_cache: dict = {}
 _news_cache_ts: float = 0
-_CACHE_TTL = 60  # seconds
+_CACHE_TTL = 300  # seconds (data refreshes every 6 hours)
 
 _SECTORS = ["All", "Markets", "Tech", "Geopolitics", "Energy", "India", "General"]
+
+
+# ── Rate Limiter ──
+# Global in-memory rate limiter — no Redis needed. Uses wall-clock time and
+# a thread lock. Each action is keyed by name and has its own cooldown.
+# This defends against rapid-fire requests from any source (multiple tabs,
+# scripts, bots) since it's server-side and global.
+
+class RateLimiter:
+    """Simple in-memory rate limiter with per-action cooldowns.
+
+    Thread-safe: uses a lock for all reads/writes to the state dict.
+    Returns seconds remaining until the action is allowed again.
+    """
+    def __init__(self):
+        self._locks: dict[str, threading.Lock] = {}
+        self._state: dict[str, float] = {}
+        self._global_lock = threading.Lock()
+
+    def _lock_for(self, key: str) -> threading.Lock:
+        with self._global_lock:
+            if key not in self._locks:
+                self._locks[key] = threading.Lock()
+            return self._locks[key]
+
+    def check(self, action: str, cooldown: float) -> float:
+        """Check if *action* is allowed. Returns 0 if allowed, or seconds
+        remaining until the cooldown expires.
+
+        Uses time.monotonic() to prevent NTP clock corrections from
+        bypassing the cooldown.
+        """
+        lock = self._lock_for(action)
+        with lock:
+            last = self._state.get(action, 0.0)
+            elapsed = time.monotonic() - last
+            if elapsed < cooldown:
+                return round(cooldown - elapsed, 1)
+            self._state[action] = time.monotonic()
+            return 0.0
+
+    def reset(self, action: str) -> None:
+        """Manually reset the cooldown (e.g. when the action is triggered
+        by the scheduler rather than by a user request)."""
+        lock = self._lock_for(action)
+        with lock:
+            self._state[action] = 0.0
+
+
+_limiter = RateLimiter()
+
 
 # ── Lifespan ──
 
@@ -54,13 +126,44 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Serious Operator News Dashboard", version="2.0.0", lifespan=lifespan)
 
+# ── CORS ──
+# In production, restrict to your frontend domain via the CORS_ORIGINS env var.
+# Format: comma-separated list (e.g. "https://app.example.com,https://admin.example.com")
+# Default: allow all origins (safe for dev, but lock down before deploying publicly).
+_allowed_origins = os.environ.get("CORS_ORIGINS", "*")
+if _allowed_origins == "*":
+    cors_origins = ["*"]
+else:
+    cors_origins = [o.strip() for o in _allowed_origins.split(",")]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ── API Key Auth ──
+# Set API_KEY in your environment to require authentication on write endpoints
+# (POST /pipeline/run, /markets/refresh, /briefing/generate).
+# The key must be sent as the X-API-Key header.
+# If API_KEY is not set, all endpoints are open (dev mode).
+_API_KEY = os.environ.get("API_KEY")
+
+
+@app.middleware("http")
+async def api_key_middleware(request: Request, call_next):
+    """Require X-API-Key header on POST endpoints when API_KEY is configured."""
+    if _API_KEY and request.method == "POST":
+        client_key = request.headers.get("X-API-Key", "")
+        if client_key != _API_KEY:
+            return JSONResponse(
+                status_code=401,
+                content={"error": "Unauthorized", "message": "Missing or invalid API key. Provide it as the X-API-Key header."},
+            )
+    return await call_next(request)
 
 
 # ── Health ──
@@ -172,7 +275,20 @@ def markets():
 
 @app.post("/markets/refresh")
 def refresh_markets():
-    """Force refresh market data."""
+    """Force refresh market data.
+
+    Rate-limited: max 1 refresh per 60 seconds to prevent abuse.
+    """
+    remaining = _limiter.check("markets", 60)
+    if remaining > 0:
+        raise HTTPException(
+            status_code=429,
+            detail={
+                "error": "Rate limited",
+                "message": f"Market data was just refreshed. Try again in {remaining:.0f} seconds.",
+                "retry_after": remaining,
+            },
+        )
     data = fetch_and_store_market_data()
     return {"status": "refreshed", "count": len(data)}
 
@@ -192,7 +308,20 @@ def get_briefing():
 
 @app.post("/briefing/generate")
 def generate_new_briefing():
-    """Generate a fresh executive briefing."""
+    """Generate a fresh executive briefing.
+
+    Rate-limited: max 1 generation per 60 seconds.
+    """
+    remaining = _limiter.check("briefing", 60)
+    if remaining > 0:
+        raise HTTPException(
+            status_code=429,
+            detail={
+                "error": "Rate limited",
+                "message": f"Briefing was just generated. Try again in {remaining:.0f} seconds.",
+                "retry_after": remaining,
+            },
+        )
     content = generate_briefing()
     return {"content": content, "created_at": datetime.now(timezone.utc).isoformat()}
 
@@ -267,7 +396,21 @@ def trending(hours: int = Query(48, ge=1, le=168)):
 
 @app.post("/pipeline/run")
 def trigger_pipeline():
-    """Manually trigger the news pipeline."""
+    """Manually trigger the news pipeline.
+
+    Rate-limited: max 1 run per 10 minutes (600 seconds) to prevent
+    abuse via the Refresh button or automated scripts.
+    """
+    remaining = _limiter.check("pipeline", 600)
+    if remaining > 0:
+        raise HTTPException(
+            status_code=429,
+            detail={
+                "error": "Rate limited",
+                "message": f"Pipeline was just run. Try again in {remaining:.0f} seconds.",
+                "retry_after": remaining,
+            },
+        )
     try:
         run_pipeline()
         return {"status": "pipeline completed"}

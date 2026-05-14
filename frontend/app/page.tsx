@@ -7,6 +7,7 @@ import { Header } from "@/components/header"
 import { BigStory } from "@/components/news/BigStory"
 import { TopStories } from "@/components/news/TopStories"
 import { SectorSection } from "@/components/news/SectorSection"
+import { SectorHeatmap } from "@/components/news/SectorHeatmap"
 import { MarketDashboard } from "@/components/markets/MarketDashboard"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -223,6 +224,9 @@ export default function Dashboard() {
 
             {/* Markets Dashboard */}
             <MarketDashboard />
+
+            {/* Sector Heatmap — visual overview with color-coded intensity */}
+            <SectorHeatmap sectorGroups={sectorGroups} activeSectors={activeSectors} />
 
             {/* Sector Navigation */}
             <Card className="border-border/50">

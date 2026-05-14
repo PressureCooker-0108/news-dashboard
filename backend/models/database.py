@@ -2,7 +2,7 @@ import os
 import json
 from datetime import datetime, timedelta, timezone
 from sqlalchemy import create_engine, desc
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
@@ -40,9 +40,19 @@ def init_db():
 # Articles
 # ──────────────────────────────────────────────
 
-def save_articles(articles_data: list[dict]) -> int:
+def save_articles(articles_data: list[dict], db: Session | None = None) -> int:
+    """Save articles, optionally reusing an existing DB session for batching.
+
+    Args:
+        articles_data: List of article dicts to insert.
+        db: Optional existing session. If provided, the caller owns commit/close.
+            If None, a new session is created, committed, and closed.
+    """
     from .models import Article
-    db = SessionLocal()
+    own_session = False
+    if db is None:
+        db = SessionLocal()
+        own_session = True
     inserted = 0
     now = datetime.now(timezone.utc).isoformat()
     try:
@@ -60,12 +70,15 @@ def save_articles(articles_data: list[dict]) -> int:
                 )
                 db.add(new_article)
                 inserted += 1
-        db.commit()
+        if own_session:
+            db.commit()
     except Exception as e:
-        db.rollback()
+        if own_session:
+            db.rollback()
         raise e
     finally:
-        db.close()
+        if own_session:
+            db.close()
     return inserted
 
 
@@ -97,9 +110,13 @@ def get_recent_articles(hours: int = 24) -> list[dict]:
 # Stories / Summaries
 # ──────────────────────────────────────────────
 
-def save_stories(stories_data: list[dict]) -> None:
+def save_stories(stories_data: list[dict], db: Session | None = None) -> None:
+    """Save stories, optionally reusing an existing DB session for batching."""
     from .models import Summary
-    db = SessionLocal()
+    own_session = False
+    if db is None:
+        db = SessionLocal()
+        own_session = True
     try:
         db.query(Summary).delete()
         now = datetime.now(timezone.utc).isoformat()
@@ -126,12 +143,15 @@ def save_stories(stories_data: list[dict]) -> None:
                 trending_score=s.get("trending_score"),
             )
             db.add(new_story)
-        db.commit()
+        if own_session:
+            db.commit()
     except Exception as e:
-        db.rollback()
+        if own_session:
+            db.rollback()
         raise e
     finally:
-        db.close()
+        if own_session:
+            db.close()
 
 
 def get_top_stories(limit: int = 10) -> list[dict]:
@@ -309,9 +329,13 @@ def get_latest_briefing() -> dict | None:
 # Sector Summaries
 # ──────────────────────────────────────────────
 
-def save_sector_summary(sector: str, summary: str, headline_count: int) -> None:
+def save_sector_summary(sector: str, summary: str, headline_count: int, db: Session | None = None) -> None:
+    """Save a sector summary, optionally reusing an existing DB session for batching."""
     from .models import SectorSummary
-    db = SessionLocal()
+    own_session = False
+    if db is None:
+        db = SessionLocal()
+        own_session = True
     now = datetime.now(timezone.utc).isoformat()
     try:
         existing = db.query(SectorSummary).filter(SectorSummary.sector == sector).first()
@@ -322,12 +346,15 @@ def save_sector_summary(sector: str, summary: str, headline_count: int) -> None:
         else:
             ss = SectorSummary(sector=sector, summary=summary, headline_count=headline_count, created_at=now)
             db.add(ss)
-        db.commit()
+        if own_session:
+            db.commit()
     except Exception as e:
-        db.rollback()
+        if own_session:
+            db.rollback()
         raise e
     finally:
-        db.close()
+        if own_session:
+            db.close()
 
 
 def get_sector_summaries() -> list[dict]:

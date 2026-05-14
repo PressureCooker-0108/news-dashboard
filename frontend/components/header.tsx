@@ -2,9 +2,10 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { RefreshCw, FileText, Download, Globe, FileDown, Sun, Moon } from "lucide-react"
+import { RefreshCw, FileText, Download, Globe, FileDown, Sun, Moon, Timer } from "lucide-react"
 import Link from "next/link"
 import { useTheme } from "next-themes"
+import { toast } from "sonner"
 import { downloadMarkdown, downloadJson, downloadPdf } from "@/lib/api"
 
 export function Header() {
@@ -14,11 +15,31 @@ export function Header() {
   const handleRefresh = async () => {
     setRefreshing(true)
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8001"}/pipeline/run`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8001"}/pipeline/run`, {
         method: "POST",
       })
+      if (res.status === 429) {
+        const body = await res.json()
+        const retryAfter = body.detail?.retry_after ?? 60
+        toast.error("Rate limited", {
+          description: `Pipeline was just run. Try again in ${Math.ceil(retryAfter)} seconds.`,
+          icon: <Timer className="h-4 w-4" />,
+          duration: 4000,
+        })
+        return
+      }
+      if (!res.ok) {
+        toast.error("Pipeline request failed", {
+          description: `Server returned ${res.status}`,
+        })
+        return
+      }
       window.location.reload()
     } catch {
+      toast.error("Network error", {
+        description: "Could not reach the server. Make sure the backend is running.",
+      })
+    } finally {
       setRefreshing(false)
     }
   }

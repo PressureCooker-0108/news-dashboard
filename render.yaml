@@ -1,16 +1,21 @@
 services:
   - type: web
     name: news-dashboard-backend
-    runtime: python
+    runtime: image
     region: oregon
     plan: free
-    buildCommand: pip install -r backend/requirements.txt
-    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+    dockerfilePath: ./backend/Dockerfile
     envVars:
       - key: DATABASE_URL
         sync: false  # Set this manually — see .env.example for Supabase setup
+      - key: API_KEY
+        sync: false  # Set this manually — generate with: openssl rand -hex 32
+      - key: CORS_ORIGINS
+        value: "https://your-frontend.vercel.app"  # Change to your actual frontend URL
       - key: PYTHON_VERSION
         value: "3.11.0"
       - key: PYTHONUNBUFFERED
         value: "1"
+      - key: LOG_LEVEL
+        value: "INFO"
     healthCheckPath: /

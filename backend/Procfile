@@ -1,1 +1,5 @@
+# ──────────────────────────────────────────────
+# Render Procfile — used when deploying WITHOUT Docker.
+# If using Docker (recommended), Render reads the Dockerfile instead.
+# ──────────────────────────────────────────────
 web: uvicorn main:app --host 0.0.0.0 --port $PORT

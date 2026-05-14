@@ -6,7 +6,7 @@ import { fetchMarketData } from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { TrendingUp, TrendingDown, BarChart3, RefreshCw } from "lucide-react"
+import { TrendingUp, TrendingDown, BarChart3, RefreshCw, Timer } from "lucide-react"
 import {
   BarChart,
   Bar,
@@ -16,6 +16,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts"
+import { toast } from "sonner"
 
 export function MarketDashboard() {
   const [data, setData] = useState<{
@@ -50,12 +51,30 @@ export function MarketDashboard() {
   async function handleRefresh() {
     setRefreshing(true)
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8001"}/markets/refresh`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8001"}/markets/refresh`, {
         method: "POST",
       })
+      if (res.status === 429) {
+        const body = await res.json()
+        const retryAfter = body.detail?.retry_after ?? 30
+        toast.error("Rate limited", {
+          description: `Market data was just refreshed. Try again in ${Math.ceil(retryAfter)} seconds.`,
+          icon: <Timer className="h-4 w-4" />,
+          duration: 4000,
+        })
+        return
+      }
+      if (!res.ok) {
+        toast.error("Refresh failed", {
+          description: `Server returned ${res.status}`,
+        })
+        return
+      }
       await load()
     } catch {
-      // ignore
+      toast.error("Network error", {
+        description: "Could not reach the server for market data refresh.",
+      })
     } finally {
       setRefreshing(false)
     }

@@ -4,7 +4,6 @@ sqlalchemy
 psycopg2-binary
 python-dotenv
 feedparser
-sentence-transformers
 numpy
 apscheduler
 python-dateutil
@@ -13,3 +12,4 @@ hdbscan
 scikit-learn
 yfinance
 fpdf2
+loguru
