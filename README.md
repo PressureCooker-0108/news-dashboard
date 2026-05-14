@@ -1,99 +1,116 @@
 # Serious Operator News Dashboard
 
-A Python backend that aggregates global news from 15+ RSS feeds, clusters similar articles into stories using sentence embeddings, ranks them by importance, and serves the results via a FastAPI API.  
-Built for founders, investors, and analysts who need high-signal, low-noise intelligence.
+High-signal global news aggregation, clustering, ranking, and briefing — designed for founders, investors, and analysts who need signal, not noise.
 
----
+## Philosophy
+
+This is not a traditional news website. It's a **decision-support tool** that answers:
+
+- What are the most important things happening today?
+- Why do they matter?
+- What are the implications?
+
+**Less is more.** Top 5–10 stories max. No clickbait. No fluff. High signal density.
+
+## Architecture
+
+```
+┌─────────────┐     ┌──────────────────┐     ┌──────────────┐
+│  16+ RSS    │ ──▶ │  Backend API     │ ──▶ │  Next.js     │
+│  Sources    │     │  FastAPI +       │     │  Frontend    │
+│             │     │  PostgreSQL      │     │  (Vercel)    │
+└─────────────┘     └──────────────────┘     └──────────────┘
+                          │
+                          ▼
+                    ┌──────────────────┐
+                    │  Pipeline (6h)   │
+                    │  Fetch → Clean   │
+                    │  → Cluster →     │
+                    │  Rank → Summarize│
+                    │  → Briefing      │
+                    └──────────────────┘
+```
+
+### Backend (Python/FastAPI)
+
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| API | FastAPI + Uvicorn | REST endpoints for news, markets, briefings |
+| Database | SQLAlchemy + PostgreSQL/SQLite | Story storage, market data, briefings |
+| Pipeline | APScheduler (6h interval) | RSS fetch → TF-IDF dedup + HDBSCAN cluster → rank → classify → summarize |
+| Services | 8 service modules | Fetch, clean, cluster, classify, rank, summarize, markets, briefing, PDF |
+| Container | Docker (multi-stage) | Single uvicorn worker for 512MB RAM free tier |
+
+### Frontend (Next.js/TypeScript)
+
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| Framework | Next.js 16 + React 19 | SSR + client components |
+| Styling | Tailwind CSS 4 | Utility-first styling |
+| UI | shadcn/ui + Radix Primitives | Accessible component library |
+| Charts | Recharts | Market movers bar chart |
+| Icons | Lucide | Consistent icon set |
+| Static Hosting | Vercel | Zero-config deployment |
 
 ## Quick Start
 
 ```bash
-# 1. Install dependencies
-pip install -r requirements.txt
+# 1. Start everything with Docker
+docker compose up -d
 
-# 2. Run the server
-uvicorn news_dashboard.main:app --reload
+# 2. Run the pipeline (fetches 16+ RSS sources)
+curl -X POST http://localhost:8001/pipeline/run
+
+# 3. Open the dashboard
+open http://localhost:3000
+
+# Or run frontend separately:
+cd frontend && npm install && npm run dev
 ```
 
-> **Note:** The first run downloads the `all-MiniLM-L6-v2` embedding model (~80 MB). This takes 1–2 minutes; subsequent starts are instant.
+## Deployment
 
----
+| Component | Host | Method |
+|-----------|------|--------|
+| Backend | Render | Docker (Dockerfile at repo root) |
+| Database | Supabase (free) or Render PostgreSQL | Connection string via DATABASE_URL |
+| Frontend | Vercel | Next.js static export (vercel.json) |
+
+See [`frontend/AGENTS.md`](frontend/AGENTS.md) for the complete AI-readable project reference.
 
 ## API Endpoints
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET`  | `/`  | Health check — returns story count and last update time |
-| `GET`  | `/news` | Top stories (default 10) |
-| `GET`  | `/news?limit=5` | Top N stories (max 20) |
+| GET | `/` | Health check (no DB dependency) |
+| GET | `/news` | Top stories (cached 5 min) |
+| GET | `/news/stories` | All stories |
+| GET | `/news/sectors` | List of active sectors |
+| GET | `/news/sector/{sector}` | Stories filtered by sector |
+| GET | `/news/sector-summaries` | Per-sector AI summaries |
+| GET | `/markets` | Market data (indices, gainers, losers) |
+| POST | `/markets/refresh` | Refresh market data (rate-limited) |
+| GET | `/briefing` | Latest executive briefing |
+| POST | `/briefing/generate` | Generate new briefing |
+| GET | `/export/markdown` | Download Markdown briefing |
+| GET | `/export/json` | Download JSON export |
+| GET | `/export/pdf` | Download PDF briefing |
+| GET | `/sources` | Source diversity stats |
+| GET | `/trending` | Trending topics (default 48h) |
+| POST | `/pipeline/run` | Trigger full pipeline (rate-limited) |
 
-### Example Response — `GET /news`
+## Environment Variables
 
-```json
-{
-  "count": 7,
-  "stories": [
-    {
-      "rank": 1,
-      "headline": "Fed Holds Rates Steady Amid Inflation Concerns",
-      "summary": "The Federal Reserve kept interest rates unchanged...",
-      "why_it_matters": "Central bank decisions directly influence borrowing costs and global capital flows.",
-      "sources": ["BBC", "Reuters"],
-      "article_count": 5,
-      "score": 0.87,
-      "latest_at": "2024-01-15T10:30:00+00:00"
-    }
-  ]
-}
-```
+See [`.env.example`](.env.example) for the full list with documentation.
 
----
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `DATABASE_URL` | For production | PostgreSQL connection string |
+| `API_KEY` | Recommended | Auth for POST endpoints |
+| `CORS_ORIGINS` | For production | Frontend URL for CORS |
+| `LOG_LEVEL` | No | Default: INFO |
+| `NEXT_PUBLIC_API_URL` | For frontend | Backend URL |
 
-## How the Pipeline Works
+## License
 
-1. **Fetch** — Pulls articles from 15 RSS feeds (Reuters, BBC, NYT, Al Jazeera, etc.)
-2. **Store** — Normalises dates to UTC, strips HTML, deduplicates by URL, and saves to SQLite
-3. **Cluster** — Embeds titles + snippets with `all-MiniLM-L6-v2` and groups similar articles using Agglomerative Clustering
-4. **Rank** — Scores each story cluster by `0.6 × coverage + 0.4 × recency` and keeps the top 10
-5. **Summarise** — Picks the most representative headline, builds a 2-sentence summary, and generates a "why it matters" blurb via keyword matching
-
-The pipeline runs **once on startup** and then **daily at 07:00** local time via APScheduler.
-
----
-
-## Adding More RSS Feeds
-
-Open `news_dashboard/config.py` and add URLs to the `RSS_FEEDS` list:
-
-```python
-RSS_FEEDS = [
-    # ... existing feeds ...
-    "https://example.com/rss",
-]
-```
-
-Restart the server to pick up changes.
-
----
-
-## Project Structure
-
-```
-news_dashboard/
-├── main.py          # FastAPI app + routes
-├── fetcher.py       # RSS fetching + normalisation
-├── database.py      # SQLite schema, queries
-├── clusterer.py     # Sentence-embedding clustering
-├── ranker.py        # Coverage + recency scoring
-├── summarizer.py    # Headline, summary, why-it-matters
-├── scheduler.py     # Pipeline orchestrator + cron
-└── config.py        # Feeds, constants, templates
-```
-
----
-
-## Tech Stack
-
-Python 3.10+ · FastAPI · SQLite · sentence-transformers · scikit-learn · APScheduler
-
-No paid APIs. Runs fully locally.
+MIT

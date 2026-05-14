@@ -1,10 +1,11 @@
 services:
   - type: web
     name: news-dashboard-backend
-    runtime: image
+    runtime: python
     region: oregon
     plan: free
-    dockerfilePath: ./Dockerfile
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
         sync: false  # ⚠️ REQUIRED — set this manually in Render dashboard.
