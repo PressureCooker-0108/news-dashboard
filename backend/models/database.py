@@ -7,16 +7,16 @@ from sqlalchemy.orm import Session, sessionmaker
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if DATABASE_URL:
-    # sslmode=require is needed for Supabase and Render Postgres, but NOT for
-    # local Docker Postgres (no SSL). Only add it if the URL doesn't already
-    # specify sslmode and isn't connecting to localhost.
-    # Only add sslmode=require for remote Postgres connections.
-    # Skip for SQLite (doesn't support it) and local Docker/Dev (no SSL).
+    # sslmode=require is needed for remote Postgres (Supabase, external hosts),
+    # but NOT for local Docker/Dev (no SSL) or Render internal PostgreSQL
+    # (connections stay within Render's network and don't use SSL).
+    # Skip for SQLite (doesn't support sslmode) and if the URL already specifies it.
     _is_sqlite = DATABASE_URL.startswith("sqlite")
     _has_sslmode = "sslmode" in DATABASE_URL
     _is_local = any(h in DATABASE_URL for h in ["localhost", "127.0.0.1"])
+    _is_render_internal = "dpg-" in DATABASE_URL.split("@")[-1].split("/")[0] if "@" in DATABASE_URL else False
 
-    if not _is_sqlite and not _has_sslmode and not _is_local:
+    if not _is_sqlite and not _has_sslmode and not _is_local and not _is_render_internal:
         engine = create_engine(
             DATABASE_URL,
             pool_size=5,
