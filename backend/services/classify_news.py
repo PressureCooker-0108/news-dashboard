@@ -1,29 +1,28 @@
 """
-Sector classification using embedding similarity with rich semantic descriptions.
+Sector classification using TF-IDF keyword overlap with rich semantic descriptions.
 Classifies news into: Markets, Tech, Geopolitics, Energy, India, General.
+
+Replaces the previous sentence-transformers approach with TF-IDF — no model
+download, instant startup, works great on news headlines which share keywords
+with the sector descriptions.
 """
 import logging
 import re
 import numpy as np
-from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 logger = logging.getLogger(__name__)
 
-# ──────────────────────────────────────────────
-# Valid sectors
-# ──────────────────────────────────────────────
+# ── Valid sectors ────────────────────────────
 VALID_SECTORS = ["Markets", "Tech", "Geopolitics", "Energy", "India", "General"]
 
-# ──────────────────────────────────────────────
-# In-memory classification cache (title → sectors list)
-# ──────────────────────────────────────────────
+# ── In-memory classification cache ───────────
 _classification_cache: dict[str, list[str]] = {}
 
-# ──────────────────────────────────────────────
-# Rich semantic sector descriptions (instead of keyword lists)
-# These work far better with sentence transformers because they describe
-# the *concept* of each sector in natural language.
-# ──────────────────────────────────────────────
+# ── Rich sector descriptions ─────────────────
+# These are keyword-rich descriptions designed to capture the vocabulary
+# associated with each sector. TF-IDF matches input text against these.
 SECTOR_DESCRIPTIONS = {
     "Markets": (
         "Financial markets and the economy. Topics include stock market indices like the S&P 500 and Dow Jones, "
@@ -71,39 +70,29 @@ SECTOR_DESCRIPTIONS = {
     ),
 }
 
-_embed_model = None
-_sector_embeddings = None
 _sector_names = list(SECTOR_DESCRIPTIONS.keys())
+
+# ── Pre-fit TF-IDF on sector descriptions ───
+# This happens once at module load — no model download, zero startup time.
+_tfidf_vectorizer = TfidfVectorizer(
+    max_features=500,
+    stop_words="english",
+    sublinear_tf=True,
+    use_idf=False,
+)
+_sector_tfidf = _tfidf_vectorizer.fit_transform(list(SECTOR_DESCRIPTIONS.values())).toarray()
 
 # Regex to split text into meaningful segments
 _SEGMENT_RE = re.compile(r"(?<=[.!?])\s+")
 
-def _get_embed_model():
-    """Lazy-load the embedding model and pre-compute sector embeddings."""
-    global _embed_model, _sector_embeddings
-    if _embed_model is None:
-        _embed_model = SentenceTransformer("all-MiniLM-L6-v2")
-        _sector_embeddings = _embed_model.encode(
-            list(SECTOR_DESCRIPTIONS.values()), convert_to_tensor=False
-        )
-        # Normalize for cosine similarity via dot product
-        _sector_embeddings = _sector_embeddings / np.linalg.norm(
-            _sector_embeddings, axis=1, keepdims=True
-        )
-    return _embed_model, _sector_embeddings
 
-
-def _classify_with_embeddings(combined_text: str) -> list[str]:
+def _classify_with_tfidf(combined_text: str) -> list[str]:
     """
-    Classify text using multi-granularity embedding similarity.
-    
-    Strategy: Instead of encoding the whole text at once (which dilutes signal),
-    encode individual sentences/segments, score each against all sectors,
-    and aggregate using a weighted vote. This captures topical signals that
-    might be buried in longer text.
-    """
-    model, sector_embs = _get_embed_model()
+    Classify text using TF-IDF similarity against sector descriptions.
 
+    Strategy: Split text into segments, compute TF-IDF for each, score each
+    against all sector descriptions, and aggregate using a weighted vote.
+    """
     if not combined_text or not combined_text.strip():
         return ["General"]
 
@@ -112,15 +101,14 @@ def _classify_with_embeddings(combined_text: str) -> list[str]:
     segments = [s.strip() for s in segments if len(s.strip()) > 20]
 
     if not segments:
-        # Fall back to encoding the whole text
+        # Fall back to the whole text
         segments = [combined_text[:500]]
 
-    # Encode all segments
-    segment_embs = model.encode(segments, show_progress_bar=False, convert_to_tensor=False)
-    segment_embs = segment_embs / np.linalg.norm(segment_embs, axis=1, keepdims=True)
+    # Transform all segments using pre-fitted vectorizer
+    segment_vecs = _tfidf_vectorizer.transform(segments).toarray()
 
-    # Compute similarity matrix: (n_segments x n_sectors)
-    sim_matrix = segment_embs @ sector_embs.T  # dot product since normalized
+    # Compute cosine similarity: (n_segments x n_sectors)
+    sim_matrix = cosine_similarity(segment_vecs, _sector_tfidf)
 
     # For each segment, find the best sector and its score
     best_sector_per_segment = np.argmax(sim_matrix, axis=1)
@@ -147,7 +135,7 @@ def _classify_with_embeddings(combined_text: str) -> list[str]:
     results = [top_sector]
 
     # Add second sector if:
-    # 1. Top confidence isn't overwhelming (> 0.65 means it's clearly one topic)
+    # 1. Top confidence isn't overwhelming (> 0.65 means clearly one topic)
     # 2. Second place has reasonable vote share
     if len(scored) > 1 and top_confidence < 0.65:
         second_sector, second_score = scored[1]
@@ -158,17 +146,16 @@ def _classify_with_embeddings(combined_text: str) -> list[str]:
     return results
 
 
-# ──────────────────────────────────────────────
-# Public API
-# ──────────────────────────────────────────────
+# ── Public API ───────────────────────────────
+
 def classify_sectors(combined_text: str) -> list[str]:
     """
-    Classify news text into 1-2 sectors using embedding-based semantic matching.
-    Uses rich semantic sector descriptions for superior accuracy over keyword lists.
-    
+    Classify news text into 1-2 sectors using TF-IDF keyword matching
+    against rich semantic sector descriptions.
+
     Args:
         combined_text: title + description/snippet combined text
-    
+
     Returns:
         List of 1-2 sector strings (e.g. ["Tech", "Markets"])
     """
@@ -177,7 +164,7 @@ def classify_sectors(combined_text: str) -> list[str]:
     if cache_key in _classification_cache:
         return _classification_cache[cache_key]
 
-    sectors = _classify_with_embeddings(combined_text)
+    sectors = _classify_with_tfidf(combined_text)
 
     # Filter out "General" unless it's the only sector
     if len(sectors) > 1 and "General" in sectors:

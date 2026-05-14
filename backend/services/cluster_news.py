@@ -1,24 +1,12 @@
 import logging
 import numpy as np
-from sentence_transformers import SentenceTransformer
 from hdbscan import HDBSCAN
 from sklearn.decomposition import LatentDirichletAllocation
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from typing import Optional
 from config import CLUSTER_THRESHOLD
-from models.database import save_embedding, get_cached_embeddings
 
 logger = logging.getLogger(__name__)
-
-_model: Optional[SentenceTransformer] = None
-
-
-def _get_model() -> SentenceTransformer:
-    global _model
-    if _model is None:
-        _model = SentenceTransformer("all-MiniLM-L6-v2")
-    return _model
 
 
 def _build_text(article: dict) -> str:
@@ -27,36 +15,19 @@ def _build_text(article: dict) -> str:
     return f"{title}. {snippet}" if snippet else title
 
 
-def _get_embeddings(articles: list[dict]) -> np.ndarray:
-    """Get embeddings with caching support."""
-    model = _get_model()
-    texts = [_build_text(a) for a in articles]
+def _get_tfidf_embeddings(texts: list[str]) -> np.ndarray:
+    """Compute TF-IDF feature vectors for a list of texts.
 
-    cached = get_cached_embeddings()
-    all_embeddings = []
-    texts_to_encode = []
-    indices_to_encode = []
-
-    for i, article in enumerate(articles):
-        aid = article.get("id", "")
-        if aid in cached:
-            all_embeddings.append(np.array(cached[aid]))
-        else:
-            all_embeddings.append(None)
-            texts_to_encode.append(texts[i])
-            indices_to_encode.append(i)
-
-    # Batch encode uncached articles
-    if texts_to_encode:
-        new_embs = model.encode(texts_to_encode, show_progress_bar=False)
-        for idx, emb in zip(indices_to_encode, new_embs):
-            all_embeddings[idx] = emb
-            try:
-                save_embedding(articles[idx]["id"], emb.tolist())
-            except Exception:
-                pass
-
-    return np.array([e for e in all_embeddings])
+    TF-IDF is deterministic and instant — no model download, no GPU needed.
+    Returns a dense numpy array compatible with cosine similarity and HDBSCAN.
+    """
+    vectorizer = TfidfVectorizer(
+        max_features=500,
+        stop_words="english",
+        sublinear_tf=True,
+    )
+    tfidf_matrix = vectorizer.fit_transform(texts)
+    return tfidf_matrix.toarray()
 
 
 def _extract_topics(texts: list[str], n_topics: int = 5) -> list[int]:
@@ -72,7 +43,7 @@ def _extract_topics(texts: list[str], n_topics: int = 5) -> list[int]:
         if n_components < 2:
             return [0] * len(texts)
 
-        lda = LatentDirichletAllocation(n_components=n_components, random_state=42, max_iter=50)
+        lda = LatentDirichletAllocation(n_components=n_components, random_state=42, max_iter=200)
         topic_dist = lda.fit_transform(dtm)
         return topic_dist.argmax(axis=1).tolist()
     except Exception as e:
@@ -81,10 +52,12 @@ def _extract_topics(texts: list[str], n_topics: int = 5) -> list[int]:
 
 
 def cluster_articles(articles: list[dict]) -> list[list[dict]]:
-    """Cluster articles using HDBSCAN + topic modeling with embedding caching.
-    
-    Deduplication and embedding computation happen in one pass to avoid 
-    computing embeddings twice.
+    """Cluster articles using HDBSCAN + topic modeling + TF-IDF features.
+
+    TF-IDF replaces sentence-transformers — no model download, instant startup,
+    works great on news headlines which have clear topic keywords.
+
+    Deduplication happens using the same TF-IDF vectors.
     """
     if not articles:
         return []
@@ -93,10 +66,13 @@ def cluster_articles(articles: list[dict]) -> list[list[dict]]:
         if len(articles) < 2:
             return [[a] for a in articles]
 
-        # 1. Get embeddings (with caching) for ALL articles first
-        embeddings = _get_embeddings(articles)
+        # Build text representations for all articles
+        texts = [_build_text(a) for a in articles]
 
-        # 2. Deduplicate using the same embeddings
+        # 1. Compute TF-IDF feature vectors (replaces sentence-transformers embeddings)
+        embeddings = _get_tfidf_embeddings(texts)
+
+        # 2. Deduplicate using cosine similarity on TF-IDF vectors
         if len(articles) > 1:
             sim_matrix = cosine_similarity(embeddings)
             kept_indices: set[int] = set()
@@ -117,12 +93,12 @@ def cluster_articles(articles: list[dict]) -> list[list[dict]]:
             sorted_kept = sorted(kept_indices)
             articles = [articles[i] for i in sorted_kept]
             embeddings = embeddings[sorted_kept]
+            texts = [texts[i] for i in sorted_kept]
 
         if len(articles) < 2:
             return [[a] for a in articles]
 
         # 3. Extract latent topics from article text
-        texts = [_build_text(a) for a in articles]
         n_topics = max(2, min(8, len(articles) // 5))
         topic_labels = _extract_topics(texts, n_topics=n_topics)
 
@@ -135,7 +111,7 @@ def cluster_articles(articles: list[dict]) -> list[list[dict]]:
             embeddings = np.concatenate([embeddings, topic_onehot * 0.3], axis=1)
 
         # 5. HDBSCAN clustering
-        min_cluster_size = max(2, min(5, len(articles) // 10))
+        min_cluster_size = max(2, len(articles) // 20)
         clusterer = HDBSCAN(
             min_cluster_size=min_cluster_size,
             min_samples=1,

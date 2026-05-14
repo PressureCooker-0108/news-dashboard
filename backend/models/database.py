@@ -37,64 +37,6 @@ def init_db():
 
 
 # ──────────────────────────────────────────────
-# Embedding Cache
-# ──────────────────────────────────────────────
-
-def save_embedding(article_id: str, embedding: list[float]) -> None:
-    from .models import Article
-    db = SessionLocal()
-    try:
-        article = db.query(Article).filter(Article.id == article_id).first()
-        if article:
-            article.embedding = json.dumps(embedding)
-            db.commit()
-    except Exception as e:
-        db.rollback()
-        raise e
-    finally:
-        db.close()
-
-
-def get_cached_embeddings() -> dict[str, list[float]]:
-    from .models import Article
-    db = SessionLocal()
-    try:
-        articles = db.query(Article).filter(Article.embedding.isnot(None)).all()
-        return {
-            a.id: json.loads(a.embedding)
-            for a in articles
-        }
-    finally:
-        db.close()
-
-
-def get_articles_without_embeddings(hours: int = 24) -> list[dict]:
-    from .models import Article
-    db = SessionLocal()
-    try:
-        cutoff = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()
-        articles = db.query(Article).filter(
-            Article.fetched_at >= cutoff,
-            Article.embedding.is_(None)
-        ).all()
-        return [
-            {
-                "id": a.id,
-                "title": a.title,
-                "url": a.url,
-                "source": a.source,
-                "published_at": a.published_at,
-                "content_snippet": a.content_snippet,
-                "fetched_at": a.fetched_at,
-                "cluster_id": a.cluster_id
-            }
-            for a in articles
-        ]
-    finally:
-        db.close()
-
-
-# ──────────────────────────────────────────────
 # Articles
 # ──────────────────────────────────────────────
 

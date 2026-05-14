@@ -8,17 +8,9 @@ services:
     startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: news-dashboard-db
-          property: connectionString
+        sync: false  # Set this manually — see .env.example for Supabase setup
       - key: PYTHON_VERSION
         value: "3.11.0"
       - key: PYTHONUNBUFFERED
         value: "1"
     healthCheckPath: /
-
-databases:
-  - name: news-dashboard-db
-    plan: free
-    region: oregon
-    postgresMajorVersion: 16

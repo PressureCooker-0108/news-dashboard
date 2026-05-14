@@ -1,58 +1,17 @@
 import logging
 import re
 import numpy as np
-from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from config import TOPIC_TEMPLATES
 
 logger = logging.getLogger(__name__)
 
-_model = None
-
-def _get_model() -> SentenceTransformer:
-    global _model
-    if _model is None:
-        _model = SentenceTransformer("all-MiniLM-L6-v2")
-    return _model
-
-
-def _pick_headline(cluster: list[dict]) -> tuple[str, str]:
-    """
-    Pick the best headline from a cluster.
-    Uses centroid-based selection: finds the title closest to the semantic centroid.
-    Also prefers titles that are informative (longer, more substantive) as a tiebreaker.
-    """
-    if len(cluster) == 1:
-        return cluster[0]["title"], cluster[0]["url"]
-    try:
-        model = _get_model()
-        titles = [a["title"] for a in cluster]
-        embeddings = model.encode(titles, show_progress_bar=False)
-        centroid = np.mean(embeddings, axis=0)
-        centroid_norm = np.linalg.norm(centroid) + 1e-9
-        emb_norms = np.linalg.norm(embeddings, axis=1)
-        sims = (embeddings @ centroid) / (emb_norms * centroid_norm)
-
-        # Prefer more informative titles (longer, more substantive) when similarity is close
-        # Weight: 80% similarity, 20% title informativeness (length normalized)
-        title_lengths = np.array([max(len(t.split()), 3) for t in titles])
-        max_len = title_lengths.max()
-        length_scores = title_lengths / max_len if max_len > 0 else np.ones_like(title_lengths)
-
-        combined_scores = 0.8 * sims + 0.2 * length_scores
-        best_idx = int(np.argmax(combined_scores))
-        return titles[best_idx], cluster[best_idx]["url"]
-    except Exception:
-        return cluster[0]["title"], cluster[0]["url"]
-
-
-_SENTENCE_RE = re.compile(r"(?<=[.!?])\s+")
-
 # ──────────────────────────────────────────────
-# Enriched topic descriptions for "Why It Matters"
-# These are rich semantic descriptions that work well with sentence transformers
+# Rich topic descriptions for TF-IDF-based "Why It Matters"
+# These are keyword-dense descriptions that work well with TF-IDF
 # for matching story content to the most relevant context template.
 # ──────────────────────────────────────────────
-_TOPIC_EMBEDDINGS = {
+_TOPIC_DESCRIPTIONS = {
     "election": (
         "Elections, political campaigns, voting, and transitions of power. "
         "Changes in government leadership that affect policy direction, "
@@ -106,6 +65,60 @@ _TOPIC_EMBEDDINGS = {
 }
 
 
+_SENTENCE_RE = re.compile(r"(?<=[.!?])\s+")
+
+# ── Pre-fit TF-IDF on rich topic descriptions for "Why It Matters" ──
+_topic_names = list(_TOPIC_DESCRIPTIONS.keys())
+_topic_texts = [_TOPIC_DESCRIPTIONS[k] for k in _topic_names]
+
+_tfidf_vectorizer = TfidfVectorizer(
+    max_features=500,
+    stop_words="english",
+    sublinear_tf=True,
+    use_idf=False,
+)
+_topic_vectors = _tfidf_vectorizer.fit_transform(_topic_texts).toarray()
+# Normalize topic vectors
+_topic_norms = np.linalg.norm(_topic_vectors, axis=1, keepdims=True) + 1e-9
+_topic_vectors = _topic_vectors / _topic_norms
+
+
+def _pick_headline(cluster: list[dict]) -> tuple[str, str]:
+    """
+    Pick the best headline from a cluster.
+    Uses TF-IDF centroid-based selection: finds the title closest to the centroid.
+    Also prefers titles that are informative (longer, more substantive) as a tiebreaker.
+    """
+    if len(cluster) == 1:
+        return cluster[0]["title"], cluster[0]["url"]
+    try:
+        titles = [a["title"] for a in cluster]
+        vectorizer = TfidfVectorizer(stop_words="english", max_features=200, sublinear_tf=True)
+        vectors = vectorizer.fit_transform(titles).toarray()
+
+        # Normalize
+        norms = np.linalg.norm(vectors, axis=1, keepdims=True) + 1e-9
+        vectors = vectors / norms
+
+        centroid = np.mean(vectors, axis=0)
+        centroid_norm = np.linalg.norm(centroid) + 1e-9
+        centroid = centroid / centroid_norm
+
+        sims = vectors @ centroid
+
+        # Prefer more informative titles (longer, more substantive) when similarity is close
+        # Weight: 80% similarity, 20% title informativeness (length normalized)
+        title_lengths = np.array([max(len(t.split()), 3) for t in titles])
+        max_len = title_lengths.max()
+        length_scores = title_lengths / max_len if max_len > 0 else np.ones_like(title_lengths)
+
+        combined_scores = 0.8 * sims + 0.2 * length_scores
+        best_idx = int(np.argmax(combined_scores))
+        return titles[best_idx], cluster[best_idx]["url"]
+    except Exception:
+        return cluster[0]["title"], cluster[0]["url"]
+
+
 def _make_summary(cluster: list[dict]) -> str:
     """
     Extractive summarization using embeddings.
@@ -152,26 +165,25 @@ def _make_summary(cluster: list[dict]) -> str:
         return " ".join(unique_sentences) + ("." if not unique_sentences[-1].endswith(".") else "")
 
     try:
-        model = _get_model()
-        sent_embs = model.encode(unique_sentences, show_progress_bar=False)
+        vectorizer = TfidfVectorizer(stop_words="english", max_features=300, sublinear_tf=True)
+        sent_vecs = vectorizer.fit_transform(unique_sentences).toarray()
 
         # Normalize for cosine similarity
-        norms = np.linalg.norm(sent_embs, axis=1, keepdims=True) + 1e-9
-        sent_embs = sent_embs / norms
+        norms = np.linalg.norm(sent_vecs, axis=1, keepdims=True) + 1e-9
+        sent_vecs = sent_vecs / norms
 
-        # Centroid: the "average" meaning of all sentences
-        centroid = np.mean(sent_embs, axis=0)
+        # Centroid: the "average" TF-IDF vector of all sentences
+        centroid = np.mean(sent_vecs, axis=0)
         centroid_norm = np.linalg.norm(centroid) + 1e-9
         centroid = centroid / centroid_norm
 
         # Score each sentence: similarity to centroid
         # Higher = more representative of the cluster's overall content
-        sims = sent_embs @ centroid
+        sims = sent_vecs @ centroid
 
         # Also score by informativeness (prefer sentences with named entities, numbers, etc.)
         inform_scores = []
         for s in unique_sentences:
-            # Count uppercase words (likely proper nouns), numbers, and longer words
             upper_words = sum(1 for w in s.split() if w[0].isupper() if len(w) > 1)
             has_numbers = bool(re.search(r"\d+", s))
             word_count = len(s.split())
@@ -191,10 +203,10 @@ def _make_summary(cluster: list[dict]) -> str:
                 break
             # Avoid selecting very similar sentences to the ones already picked
             if selected:
-                selected_emb = sent_embs[idx]
+                selected_vec = sent_vecs[idx]
                 too_similar = False
                 for sel_idx in selected:
-                    if float(selected_emb @ sent_embs[sel_idx]) > 0.85:
+                    if float(selected_vec @ sent_vecs[sel_idx]) > 0.85:
                         too_similar = True
                         break
                 if not too_similar:
@@ -223,10 +235,10 @@ def _make_summary(cluster: list[dict]) -> str:
 
 def _why_it_matters(cluster: list[dict]) -> str:
     """
-    Determine why a story matters using embedding-based topic matching.
+    Determine why a story matters using TF-IDF topic matching.
     
-    Instead of naive regex keyword matching, this approach embeds the
-    cluster's text and compares against enriched topic descriptions
+    Transforms the cluster's text using the pre-fitted TF-IDF vectorizer
+    and compares against pre-computed topic description vectors
     to find the most relevant context.
     """
     combined_text = " ".join(
@@ -235,26 +247,16 @@ def _why_it_matters(cluster: list[dict]) -> str:
     )
 
     try:
-        model = _get_model()
-        # Encode the combined text
-        text_emb = model.encode([combined_text[:500]], show_progress_bar=False)[0]
+        # Transform article text using pre-fitted vectorizer
+        text_vec = _tfidf_vectorizer.transform([combined_text[:500]]).toarray()[0]
+        text_norm = np.linalg.norm(text_vec) + 1e-9
+        text_vec = text_vec / text_norm
 
-        # Encode topic descriptions
-        topic_names = list(_TOPIC_EMBEDDINGS.keys())
-        topic_embs = model.encode(
-            [_TOPIC_EMBEDDINGS[t] for t in topic_names],
-            show_progress_bar=False,
-        )
-
-        # Normalize
-        text_emb = text_emb / (np.linalg.norm(text_emb) + 1e-9)
-        topic_embs = topic_embs / (np.linalg.norm(topic_embs, axis=1, keepdims=True) + 1e-9)
-
-        # Compute similarities
-        sims = topic_embs @ text_emb
+        # Compute similarities against pre-computed topic vectors
+        sims = _topic_vectors @ text_vec
 
         best_idx = int(np.argmax(sims))
-        best_topic = topic_names[best_idx]
+        best_topic = _topic_names[best_idx]
         best_score = float(sims[best_idx])
 
         # Only use topic if similarity is above threshold
