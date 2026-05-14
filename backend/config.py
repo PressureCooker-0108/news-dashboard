@@ -33,7 +33,7 @@ RSS_FEEDS = [
 # Pipeline Constants
 # ──────────────────────────────────────────────
 MAX_STORIES = 20
-CLUSTER_THRESHOLD = 0.35
+CLUSTER_THRESHOLD = 0.45
 RECENCY_WEIGHT = 0.4
 COVERAGE_WEIGHT = 0.6
 

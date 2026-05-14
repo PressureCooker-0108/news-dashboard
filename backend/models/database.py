@@ -1,39 +1,101 @@
 import os
 import json
-from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from datetime import datetime, timedelta, timezone
+from sqlalchemy import create_engine, desc
+from sqlalchemy.orm import sessionmaker
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Use connection pooling
-engine = create_engine(
-    DATABASE_URL, 
-    pool_size=5, 
-    max_overflow=10,
-    connect_args={"sslmode": "require"}
-)
+if DATABASE_URL:
+    engine = create_engine(
+        DATABASE_URL,
+        pool_size=5,
+        max_overflow=10,
+        connect_args={"sslmode": "require"},
+    )
+else:
+    engine = create_engine(
+        "sqlite:///news.db",
+        connect_args={"check_same_thread": False},
+    )
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+from .models import Base
+
 
 def get_db():
-    """Dependency to provide a database session."""
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
 
-from datetime import datetime, timedelta, timezone
-from sqlalchemy import desc
 
-# Import models inline to avoid circular imports during setup
 def init_db():
-    """Initializes the database schema."""
-    from .models import Article, Cluster, Summary
+    from .models import Article, Cluster, Summary, MarketData, Briefing, SectorSummary
     Base.metadata.create_all(bind=engine)
 
+
 # ──────────────────────────────────────────────
-# Helper Functions
+# Embedding Cache
+# ──────────────────────────────────────────────
+
+def save_embedding(article_id: str, embedding: list[float]) -> None:
+    from .models import Article
+    db = SessionLocal()
+    try:
+        article = db.query(Article).filter(Article.id == article_id).first()
+        if article:
+            article.embedding = json.dumps(embedding)
+            db.commit()
+    except Exception as e:
+        db.rollback()
+        raise e
+    finally:
+        db.close()
+
+
+def get_cached_embeddings() -> dict[str, list[float]]:
+    from .models import Article
+    db = SessionLocal()
+    try:
+        articles = db.query(Article).filter(Article.embedding.isnot(None)).all()
+        return {
+            a.id: json.loads(a.embedding)
+            for a in articles
+        }
+    finally:
+        db.close()
+
+
+def get_articles_without_embeddings(hours: int = 24) -> list[dict]:
+    from .models import Article
+    db = SessionLocal()
+    try:
+        cutoff = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()
+        articles = db.query(Article).filter(
+            Article.fetched_at >= cutoff,
+            Article.embedding.is_(None)
+        ).all()
+        return [
+            {
+                "id": a.id,
+                "title": a.title,
+                "url": a.url,
+                "source": a.source,
+                "published_at": a.published_at,
+                "content_snippet": a.content_snippet,
+                "fetched_at": a.fetched_at,
+                "cluster_id": a.cluster_id
+            }
+            for a in articles
+        ]
+    finally:
+        db.close()
+
+
+# ──────────────────────────────────────────────
+# Articles
 # ──────────────────────────────────────────────
 
 def save_articles(articles_data: list[dict]) -> int:
@@ -64,6 +126,7 @@ def save_articles(articles_data: list[dict]) -> int:
         db.close()
     return inserted
 
+
 def get_recent_articles(hours: int = 24) -> list[dict]:
     from .models import Article
     db = SessionLocal()
@@ -87,6 +150,11 @@ def get_recent_articles(hours: int = 24) -> list[dict]:
     finally:
         db.close()
 
+
+# ──────────────────────────────────────────────
+# Stories / Summaries
+# ──────────────────────────────────────────────
+
 def save_stories(stories_data: list[dict]) -> None:
     from .models import Summary
     db = SessionLocal()
@@ -94,7 +162,6 @@ def save_stories(stories_data: list[dict]) -> None:
         db.query(Summary).delete()
         now = datetime.now(timezone.utc).isoformat()
         for s in stories_data:
-            # sectors is a list — serialize to JSON string for storage
             sectors = s.get("sectors", ["General"])
             if isinstance(sectors, list):
                 sectors_str = json.dumps(sectors)
@@ -112,7 +179,9 @@ def save_stories(stories_data: list[dict]) -> None:
                 published_at=s.get("published_at", now),
                 latest_at=s.get("latest_at", now),
                 created_at=now,
-                sectors=sectors_str
+                sectors=sectors_str,
+                sector_summary=s.get("sector_summary"),
+                trending_score=s.get("trending_score"),
             )
             db.add(new_story)
         db.commit()
@@ -122,6 +191,7 @@ def save_stories(stories_data: list[dict]) -> None:
     finally:
         db.close()
 
+
 def get_top_stories(limit: int = 10) -> list[dict]:
     from .models import Summary
     db = SessionLocal()
@@ -129,7 +199,6 @@ def get_top_stories(limit: int = 10) -> list[dict]:
         stories = db.query(Summary).order_by(desc(Summary.score)).limit(limit).all()
         results = []
         for s in stories:
-            # Deserialize sectors JSON string back to list
             try:
                 sectors = json.loads(s.sectors) if s.sectors else ["General"]
             except (json.JSONDecodeError, TypeError):
@@ -146,11 +215,50 @@ def get_top_stories(limit: int = 10) -> list[dict]:
                 "published_at": s.published_at,
                 "latest_at": s.latest_at,
                 "created_at": s.created_at,
-                "sectors": sectors
+                "sectors": sectors,
+                "sector_summary": s.sector_summary,
+                "trending_score": s.trending_score,
             })
         return results
     finally:
         db.close()
+
+
+def get_stories_by_sector(sector: str, limit: int = 20) -> list[dict]:
+    """Get top stories filtered by a specific sector."""
+    from .models import Summary
+    db = SessionLocal()
+    try:
+        all_stories = db.query(Summary).order_by(desc(Summary.score)).limit(100).all()
+        results = []
+        for s in all_stories:
+            try:
+                sectors = json.loads(s.sectors) if s.sectors else ["General"]
+            except (json.JSONDecodeError, TypeError):
+                sectors = ["General"]
+
+            if sector.lower() in [sec.lower() for sec in sectors]:
+                results.append({
+                    "title": s.title,
+                    "summary": s.summary,
+                    "why_it_matters": s.why_it_matters,
+                    "url": s.url,
+                    "score": s.score,
+                    "article_count": s.article_count,
+                    "source": s.source.split(",") if s.source else [],
+                    "published_at": s.published_at,
+                    "latest_at": s.latest_at,
+                    "created_at": s.created_at,
+                    "sectors": sectors,
+                    "sector_summary": s.sector_summary,
+                    "trending_score": s.trending_score,
+                })
+                if len(results) >= limit:
+                    break
+        return results
+    finally:
+        db.close()
+
 
 def story_count() -> int:
     from .models import Summary
@@ -160,11 +268,185 @@ def story_count() -> int:
     finally:
         db.close()
 
+
 def last_updated() -> str | None:
     from .models import Summary
     db = SessionLocal()
     try:
         res = db.query(Summary.created_at).order_by(desc(Summary.created_at)).first()
         return res[0] if res else None
+    finally:
+        db.close()
+
+
+# ──────────────────────────────────────────────
+# Market Data
+# ──────────────────────────────────────────────
+
+def save_market_data(data: list[dict]) -> None:
+    from .models import MarketData
+    db = SessionLocal()
+    now = datetime.now(timezone.utc).isoformat()
+    try:
+        # Clear old data
+        db.query(MarketData).delete()
+        for d in data:
+            md = MarketData(
+                ticker=d["ticker"],
+                name=d.get("name", ""),
+                price=d.get("price", 0),
+                change=d.get("change", 0),
+                change_pct=d.get("change_pct", 0),
+                market_cap=d.get("market_cap"),
+                sector=d.get("sector", "General"),
+                recorded_at=now,
+            )
+            db.add(md)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise e
+    finally:
+        db.close()
+
+
+def get_market_data() -> list[dict]:
+    from .models import MarketData
+    db = SessionLocal()
+    try:
+        records = db.query(MarketData).all()
+        return [
+            {
+                "ticker": r.ticker,
+                "name": r.name,
+                "price": r.price,
+                "change": r.change,
+                "change_pct": r.change_pct,
+                "market_cap": r.market_cap,
+                "sector": r.sector,
+            }
+            for r in records
+        ]
+    finally:
+        db.close()
+
+
+# ──────────────────────────────────────────────
+# Briefings
+# ──────────────────────────────────────────────
+
+def save_briefing(content: str) -> None:
+    from .models import Briefing
+    db = SessionLocal()
+    now = datetime.now(timezone.utc).isoformat()
+    try:
+        db.query(Briefing).delete()
+        b = Briefing(content=content, created_at=now)
+        db.add(b)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise e
+    finally:
+        db.close()
+
+
+def get_latest_briefing() -> dict | None:
+    from .models import Briefing
+    db = SessionLocal()
+    try:
+        b = db.query(Briefing).order_by(desc(Briefing.created_at)).first()
+        if b:
+            return {"content": b.content, "created_at": b.created_at}
+        return None
+    finally:
+        db.close()
+
+
+# ──────────────────────────────────────────────
+# Sector Summaries
+# ──────────────────────────────────────────────
+
+def save_sector_summary(sector: str, summary: str, headline_count: int) -> None:
+    from .models import SectorSummary
+    db = SessionLocal()
+    now = datetime.now(timezone.utc).isoformat()
+    try:
+        existing = db.query(SectorSummary).filter(SectorSummary.sector == sector).first()
+        if existing:
+            existing.summary = summary
+            existing.headline_count = headline_count
+            existing.created_at = now
+        else:
+            ss = SectorSummary(sector=sector, summary=summary, headline_count=headline_count, created_at=now)
+            db.add(ss)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise e
+    finally:
+        db.close()
+
+
+def get_sector_summaries() -> list[dict]:
+    from .models import SectorSummary
+    db = SessionLocal()
+    try:
+        records = db.query(SectorSummary).all()
+        return [
+            {
+                "sector": r.sector,
+                "summary": r.summary,
+                "headline_count": r.headline_count,
+                "created_at": r.created_at,
+            }
+            for r in records
+        ]
+    finally:
+        db.close()
+
+
+# ──────────────────────────────────────────────
+# Source Diversity
+# ──────────────────────────────────────────────
+
+def get_source_diversity() -> list[dict]:
+    """Get source diversity stats from recent articles."""
+    from .models import Article
+    db = SessionLocal()
+    try:
+        cutoff = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+        articles = db.query(Article).filter(Article.fetched_at >= cutoff).all()
+
+        source_counts: dict[str, int] = {}
+        for a in articles:
+            source_counts[a.source] = source_counts.get(a.source, 0) + 1
+
+        total = sum(source_counts.values()) or 1
+        return [
+            {"source": src, "count": cnt, "pct": round(cnt / total * 100, 1)}
+            for src, cnt in sorted(source_counts.items(), key=lambda x: -x[1])
+        ]
+    finally:
+        db.close()
+
+
+def get_trending_topics(hours: int = 48) -> list[dict]:
+    """Get trending topics based on story scores over time."""
+    from .models import Summary
+    db = SessionLocal()
+    try:
+        cutoff = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()
+        stories = db.query(Summary).filter(Summary.created_at >= cutoff).order_by(desc(Summary.score)).limit(20).all()
+        return [
+            {
+                "title": s.title,
+                "score": s.score,
+                "article_count": s.article_count,
+                "sectors": json.loads(s.sectors) if s.sectors else ["General"],
+                "created_at": s.created_at,
+            }
+            for s in stories
+        ]
     finally:
         db.close()
