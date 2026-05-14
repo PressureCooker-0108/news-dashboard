@@ -5,7 +5,7 @@ import time
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 
-from fastapi import FastAPI, Query, HTTPException, Request
+from fastapi import FastAPI, Query, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse, StreamingResponse
@@ -24,15 +24,41 @@ from services.pdf_briefing import generate_pdf_briefing
 # ── Logging ──
 # Structured JSON logging with loguru. Logs go to stdout (captured by Docker/Render)
 # and to a rotating file for local debugging.
+#
+# When LOG_FORMAT=json, logs are emitted as single-line JSON objects suitable for
+# Datadog, CloudWatch, Logstash, and other log aggregators.
+# When LOG_FORMAT=text (default), human-readable format is used.
 os.makedirs("logs", exist_ok=True)
 loguru_logger.remove()  # Remove default handler
-loguru_logger.add(
-    sink=lambda msg: print(msg, end=""),
-    format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level:<8}</level> | <cyan>{name}</cyan> | <level>{message}</level>",
-    colorize=True,
-    level=os.environ.get("LOG_LEVEL", "INFO"),
-)
-# Also write to rotating file (10 MB per file, keep 3)
+
+_log_format = os.environ.get("LOG_FORMAT", "text").lower()
+_log_level = os.environ.get("LOG_LEVEL", "INFO").upper()
+
+if _log_format == "json":
+    import json as _json
+    loguru_logger.add(
+        sink=lambda msg: print(msg, end=""),
+        format=lambda record: _json.dumps({
+            "timestamp": record["time"].strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+            "level": record["level"].name,
+            "logger": record["name"],
+            "module": record["module"],
+            "function": record["function"],
+            "line": record["line"],
+            "message": record["message"],
+        }, default=str),
+        colorize=False,
+        level=_log_level,
+    )
+else:
+    loguru_logger.add(
+        sink=lambda msg: print(msg, end=""),
+        format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level:<8}</level> | <cyan>{name}</cyan> | <level>{message}</level>",
+        colorize=True,
+        level=_log_level,
+    )
+
+# Also write to rotating file (10 MB per file, keep 3) — always human-readable for local debugging
 loguru_logger.add(
     "logs/pipeline.log",
     rotation="10 MB",
@@ -138,6 +164,23 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ── Security Headers ──
+# Adds security-related HTTP headers to all responses to harden against XSS,
+# clickjacking, MIME sniffing, and other common web attacks.
+# In production, set CORS_ORIGINS to your frontend domain.
+
+@app.middleware("http")
+async def security_headers_middleware(request: Request, call_next):
+    """Add security headers to every response."""
+    response: Response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    return response
 
 
 # ── API Key Auth ──

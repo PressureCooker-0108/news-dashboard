@@ -1,6 +1,5 @@
 #!/bin/bash
 # Startup script for the News Dashboard Backend on Render
-# This handles the sentence-transformers model cache and starts the server
 
 set -e
 

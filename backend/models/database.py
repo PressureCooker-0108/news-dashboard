@@ -203,36 +203,47 @@ def get_top_stories(limit: int = 10) -> list[dict]:
 
 
 def get_stories_by_sector(sector: str, limit: int = 20) -> list[dict]:
-    """Get top stories filtered by a specific sector."""
+    """Get top stories filtered by a specific sector.
+
+    Uses SQL LIKE on the JSON-encoded sectors column to push filtering
+    down to the database rather than fetching all rows and filtering in Python.
+    Case-insensitive via SQL lower() since sectors are stored with capital
+    first letters (e.g. '["Markets", "Tech"]').
+    """
     from .models import Summary
+    from sqlalchemy import func
     db = SessionLocal()
     try:
-        all_stories = db.query(Summary).order_by(desc(Summary.score)).limit(100).all()
+        pattern = f"%{sector}%"
+        stories = (
+            db.query(Summary)
+            .filter(func.lower(Summary.sectors).like(func.lower(pattern)))
+            .order_by(desc(Summary.score))
+            .limit(limit)
+            .all()
+        )
         results = []
-        for s in all_stories:
+        for s in stories:
             try:
                 sectors = json.loads(s.sectors) if s.sectors else ["General"]
             except (json.JSONDecodeError, TypeError):
                 sectors = ["General"]
 
-            if sector.lower() in [sec.lower() for sec in sectors]:
-                results.append({
-                    "title": s.title,
-                    "summary": s.summary,
-                    "why_it_matters": s.why_it_matters,
-                    "url": s.url,
-                    "score": s.score,
-                    "article_count": s.article_count,
-                    "source": s.source.split(",") if s.source else [],
-                    "published_at": s.published_at,
-                    "latest_at": s.latest_at,
-                    "created_at": s.created_at,
-                    "sectors": sectors,
-                    "sector_summary": s.sector_summary,
-                    "trending_score": s.trending_score,
-                })
-                if len(results) >= limit:
-                    break
+            results.append({
+                "title": s.title,
+                "summary": s.summary,
+                "why_it_matters": s.why_it_matters,
+                "url": s.url,
+                "score": s.score,
+                "article_count": s.article_count,
+                "source": s.source.split(",") if s.source else [],
+                "published_at": s.published_at,
+                "latest_at": s.latest_at,
+                "created_at": s.created_at,
+                "sectors": sectors,
+                "sector_summary": s.sector_summary,
+                "trending_score": s.trending_score,
+            })
         return results
     finally:
         db.close()
