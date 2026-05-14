@@ -12,7 +12,7 @@ from fastapi.responses import PlainTextResponse, StreamingResponse
 from loguru import logger as loguru_logger
 
 from models.database import (
-    init_db, get_top_stories, story_count, last_updated,
+    init_db, get_top_stories,
     get_stories_by_sector, get_market_data, get_latest_briefing,
     get_source_diversity, get_trending_topics, get_sector_summaries
 )
@@ -109,18 +109,12 @@ async def lifespan(app: FastAPI):
     init_db()
     logger.info("Database initialized.")
 
-    # Run pipeline in background on startup
-    def _initial_run():
-        try:
-            run_pipeline()
-        except Exception as e:
-            logger.warning(f"Initial pipeline run failed (will retry via scheduler): {e}")
-
-    t = threading.Thread(target=_initial_run, daemon=True)
-    t.start()
-
-    # Start APScheduler
-    start_scheduler()
+    # Skip scheduler in test mode
+    if not os.environ.get("_TESTING"):
+        # Start APScheduler (pipeline runs every 6 hours)
+        # NOT running the full pipeline on startup — it causes OOM on Render's
+        # free tier (512 MB). The scheduler handles it.
+        start_scheduler()
 
     yield
 
@@ -171,11 +165,9 @@ async def api_key_middleware(request: Request, call_next):
 
 @app.get("/")
 def health():
-    return {
-        "status": "seriously operational",
-        "stories": story_count(),
-        "last_updated": last_updated(),
-    }
+    """Health check for Render. NEVER touches the database — must always return 200
+    even if the DB is down, otherwise Render marks the deploy as failed and restarts."""
+    return {"status": "seriously operational"}
 
 
 # ── News Endpoints ──

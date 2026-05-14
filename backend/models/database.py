@@ -10,7 +10,13 @@ if DATABASE_URL:
     # sslmode=require is needed for Supabase and Render Postgres, but NOT for
     # local Docker Postgres (no SSL). Only add it if the URL doesn't already
     # specify sslmode and isn't connecting to localhost.
-    if "sslmode" not in DATABASE_URL and "localhost" not in DATABASE_URL and "127.0.0.1" not in DATABASE_URL:
+    # Only add sslmode=require for remote Postgres connections.
+    # Skip for SQLite (doesn't support it) and local Docker/Dev (no SSL).
+    _is_sqlite = DATABASE_URL.startswith("sqlite")
+    _has_sslmode = "sslmode" in DATABASE_URL
+    _is_local = any(h in DATABASE_URL for h in ["localhost", "127.0.0.1"])
+
+    if not _is_sqlite and not _has_sslmode and not _is_local:
         engine = create_engine(
             DATABASE_URL,
             pool_size=5,

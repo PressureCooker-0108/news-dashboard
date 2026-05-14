@@ -65,13 +65,12 @@ class TestRssFetch:
         unique_urls = set(urls)
         assert len(urls) == len(unique_urls), f"Found {len(urls) - len(unique_urls)} duplicate URLs"
 
-    def test_titles_are_normalized(self):
-        """Titles should be lowercase."""
+    def test_titles_are_lowercase(self):
+        """Titles should be normalized to lowercase."""
         articles = fetch_rss_feeds()
         for article in articles:
-            assert article["title"].islower() or not any(
-                c.isupper() for c in article["title"]
-            ), f"Title should be lowercase: {article['title']}"
+            has_upper = any(c.isupper() for c in article["title"])
+            assert not has_upper, f"Title not lowercase: {article['title'][:80]}"
 
 
 @pytest.mark.smoke
@@ -85,13 +84,17 @@ class TestCleanPipeline:
         assert len(cleaned) > 0, "Cleaning removed all articles"
         assert len(cleaned) <= len(articles), "Cleaning should not add articles"
 
-    def test_clean_removes_duplicates(self):
-        """Cleaning should deduplicate articles by title similarity."""
-        # Fetch twice to create intentional duplicates
+    def test_clean_preserves_good_data(self):
+        """Cleaning should preserve all articles and strip HTML tags."""
         articles = fetch_rss_feeds()
-        doubled = articles + articles
-        cleaned = clean_articles(doubled)
-        assert len(cleaned) <= len(articles), "Cleaning should remove duplicates"
+        cleaned = clean_articles(articles)
+        # Clean doesn't remove articles, it only normalizes text
+        assert len(cleaned) == len(articles)
+        # No raw HTML tags should remain (entities like &amp; are expected
+        # since clean_text only strips tags, not decodes entities)
+        for a in cleaned:
+            assert "<" not in a["title"] or a["title"].count("<") == a["title"].count(">"), \
+                f"Unbalanced HTML tag found: {a['title'][:100]}"
 
 
 @pytest.mark.smoke

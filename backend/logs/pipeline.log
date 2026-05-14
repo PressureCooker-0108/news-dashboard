@@ -1,0 +1,546 @@
+2026-05-15 02:30:50 | INFO     | main | Initializing database...
+2026-05-15 02:30:50 | INFO     | main | Database initialized.
+2026-05-15 02:30:50 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:30:50 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:30:50 | INFO     | scheduler | Scheduler started — pipeline runs every 6 hours
+2026-05-15 02:30:50 | INFO     | main | Initializing database...
+2026-05-15 02:30:50 | INFO     | main | Database initialized.
+2026-05-15 02:30:50 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:30:50 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:30:51 | INFO     | main | Initializing database...
+2026-05-15 02:30:51 | INFO     | main | Database initialized.
+2026-05-15 02:30:51 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:30:51 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:30:51 | INFO     | main | Initializing database...
+2026-05-15 02:30:51 | INFO     | main | Database initialized.
+2026-05-15 02:30:51 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:30:51 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:30:52 | INFO     | main | Initializing database...
+2026-05-15 02:30:52 | INFO     | main | Database initialized.
+2026-05-15 02:30:52 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:30:52 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:30:52 | INFO     | main | Initializing database...
+2026-05-15 02:30:52 | INFO     | main | Database initialized.
+2026-05-15 02:30:52 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:30:52 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:30:53 | INFO     | main | Initializing database...
+2026-05-15 02:30:53 | INFO     | main | Database initialized.
+2026-05-15 02:30:53 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:30:53 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:30:53 | INFO     | main | Initializing database...
+2026-05-15 02:30:53 | INFO     | main | Database initialized.
+2026-05-15 02:30:53 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:30:53 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:30:54 | INFO     | main | Initializing database...
+2026-05-15 02:30:54 | INFO     | main | Database initialized.
+2026-05-15 02:30:54 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:30:54 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:30:54 | INFO     | main | Initializing database...
+2026-05-15 02:30:54 | INFO     | main | Database initialized.
+2026-05-15 02:30:54 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:30:54 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:30:55 | INFO     | main | Initializing database...
+2026-05-15 02:30:55 | INFO     | main | Database initialized.
+2026-05-15 02:30:55 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:30:55 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:30:55 | INFO     | main | Initializing database...
+2026-05-15 02:30:55 | INFO     | main | Database initialized.
+2026-05-15 02:30:55 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:30:55 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:30:58 | INFO     | main | Initializing database...
+2026-05-15 02:30:58 | INFO     | main | Database initialized.
+2026-05-15 02:30:58 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:30:58 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:30:59 | INFO     | main | Initializing database...
+2026-05-15 02:30:59 | INFO     | main | Database initialized.
+2026-05-15 02:30:59 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:30:59 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:30:59 | INFO     | main | Initializing database...
+2026-05-15 02:30:59 | INFO     | main | Database initialized.
+2026-05-15 02:30:59 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:30:59 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:00 | INFO     | main | Initializing database...
+2026-05-15 02:31:00 | INFO     | main | Database initialized.
+2026-05-15 02:31:00 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:00 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:00 | INFO     | main | Initializing database...
+2026-05-15 02:31:00 | INFO     | main | Database initialized.
+2026-05-15 02:31:00 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:00 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:00 | INFO     | main | Initializing database...
+2026-05-15 02:31:01 | INFO     | main | Database initialized.
+2026-05-15 02:31:01 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:01 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:12 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:12 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:13 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:13 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:14 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:14 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:15 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:15 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:16 | INFO     | scheduler | Inserted 1063 new articles
+2026-05-15 02:31:16 | INFO     | scheduler | Got 0 recent articles for clustering
+2026-05-15 02:31:16 | WARNING  | scheduler | No recent articles to process
+2026-05-15 02:31:16 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:16 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:17 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:17 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:18 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:18 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:18 | INFO     | scheduler | Inserted 1063 new articles
+2026-05-15 02:31:18 | INFO     | scheduler | Got 0 recent articles for clustering
+2026-05-15 02:31:18 | WARNING  | scheduler | No recent articles to process
+2026-05-15 02:31:18 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:18 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:19 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:19 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:19 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:19 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:19 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:19 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:19 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:19 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:19 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:19 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:19 | INFO     | scheduler | Inserted 1063 new articles
+2026-05-15 02:31:19 | INFO     | scheduler | Got 0 recent articles for clustering
+2026-05-15 02:31:19 | WARNING  | scheduler | No recent articles to process
+2026-05-15 02:31:19 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:19 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:19 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:19 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:20 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:20 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:20 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:20 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:20 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:22 | INFO     | main | Initializing database...
+2026-05-15 02:31:22 | INFO     | main | Database initialized.
+2026-05-15 02:31:22 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:22 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:22 | INFO     | scheduler | Scheduler started — pipeline runs every 6 hours
+2026-05-15 02:31:22 | INFO     | main | Initializing database...
+2026-05-15 02:31:22 | INFO     | main | Database initialized.
+2026-05-15 02:31:22 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:22 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:23 | INFO     | main | Initializing database...
+2026-05-15 02:31:23 | INFO     | main | Database initialized.
+2026-05-15 02:31:23 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:23 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:23 | INFO     | main | Initializing database...
+2026-05-15 02:31:23 | INFO     | main | Database initialized.
+2026-05-15 02:31:23 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:23 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:23 | INFO     | main | Initializing database...
+2026-05-15 02:31:23 | INFO     | main | Database initialized.
+2026-05-15 02:31:23 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:23 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:24 | INFO     | main | Initializing database...
+2026-05-15 02:31:24 | INFO     | main | Database initialized.
+2026-05-15 02:31:24 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:24 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:24 | INFO     | main | Initializing database...
+2026-05-15 02:31:24 | INFO     | main | Database initialized.
+2026-05-15 02:31:24 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:24 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:25 | INFO     | main | Initializing database...
+2026-05-15 02:31:25 | INFO     | main | Database initialized.
+2026-05-15 02:31:25 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:25 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:25 | INFO     | main | Initializing database...
+2026-05-15 02:31:25 | INFO     | main | Database initialized.
+2026-05-15 02:31:25 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:25 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:25 | INFO     | main | Initializing database...
+2026-05-15 02:31:25 | INFO     | main | Database initialized.
+2026-05-15 02:31:25 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:25 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:26 | INFO     | main | Initializing database...
+2026-05-15 02:31:26 | INFO     | main | Database initialized.
+2026-05-15 02:31:26 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:26 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:26 | INFO     | main | Initializing database...
+2026-05-15 02:31:26 | INFO     | main | Database initialized.
+2026-05-15 02:31:26 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:26 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:26 | INFO     | main | Initializing database...
+2026-05-15 02:31:26 | INFO     | main | Database initialized.
+2026-05-15 02:31:26 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:26 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:27 | INFO     | main | Initializing database...
+2026-05-15 02:31:27 | INFO     | main | Database initialized.
+2026-05-15 02:31:27 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:27 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:27 | INFO     | main | Initializing database...
+2026-05-15 02:31:27 | INFO     | main | Database initialized.
+2026-05-15 02:31:27 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:27 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:27 | INFO     | main | Initializing database...
+2026-05-15 02:31:27 | INFO     | main | Database initialized.
+2026-05-15 02:31:27 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:27 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:28 | INFO     | main | Initializing database...
+2026-05-15 02:31:28 | INFO     | main | Database initialized.
+2026-05-15 02:31:28 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:28 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:28 | INFO     | main | Initializing database...
+2026-05-15 02:31:28 | INFO     | main | Database initialized.
+2026-05-15 02:31:28 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:31:28 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:31:40 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:40 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:41 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:41 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:41 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:41 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:42 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:42 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:42 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:42 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:42 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:42 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:42 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:42 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Inserted 1063 new articles
+2026-05-15 02:31:43 | INFO     | scheduler | Got 0 recent articles for clustering
+2026-05-15 02:31:43 | WARNING  | scheduler | No recent articles to process
+2026-05-15 02:31:43 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:31:43 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:17 | INFO     | main | Initializing database...
+2026-05-15 02:33:17 | INFO     | main | Database initialized.
+2026-05-15 02:33:17 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:17 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:17 | INFO     | scheduler | Scheduler started — pipeline runs every 6 hours
+2026-05-15 02:33:17 | INFO     | main | Initializing database...
+2026-05-15 02:33:17 | INFO     | main | Database initialized.
+2026-05-15 02:33:17 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:17 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:18 | INFO     | main | Initializing database...
+2026-05-15 02:33:18 | INFO     | main | Database initialized.
+2026-05-15 02:33:18 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:18 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:18 | INFO     | main | Initializing database...
+2026-05-15 02:33:18 | INFO     | main | Database initialized.
+2026-05-15 02:33:18 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:18 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:18 | INFO     | main | Initializing database...
+2026-05-15 02:33:18 | INFO     | main | Database initialized.
+2026-05-15 02:33:18 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:18 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:19 | INFO     | main | Initializing database...
+2026-05-15 02:33:19 | INFO     | main | Database initialized.
+2026-05-15 02:33:19 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:19 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:19 | INFO     | main | Initializing database...
+2026-05-15 02:33:19 | INFO     | main | Database initialized.
+2026-05-15 02:33:19 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:19 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:19 | INFO     | main | Initializing database...
+2026-05-15 02:33:19 | INFO     | main | Database initialized.
+2026-05-15 02:33:19 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:19 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:20 | INFO     | main | Initializing database...
+2026-05-15 02:33:20 | INFO     | main | Database initialized.
+2026-05-15 02:33:20 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:20 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:20 | INFO     | main | Initializing database...
+2026-05-15 02:33:20 | INFO     | main | Database initialized.
+2026-05-15 02:33:20 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:20 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:20 | INFO     | main | Initializing database...
+2026-05-15 02:33:20 | INFO     | main | Database initialized.
+2026-05-15 02:33:20 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:20 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:21 | INFO     | main | Initializing database...
+2026-05-15 02:33:21 | INFO     | main | Database initialized.
+2026-05-15 02:33:21 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:21 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:21 | INFO     | main | Initializing database...
+2026-05-15 02:33:21 | INFO     | main | Database initialized.
+2026-05-15 02:33:21 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:21 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:21 | INFO     | main | Initializing database...
+2026-05-15 02:33:21 | INFO     | main | Database initialized.
+2026-05-15 02:33:21 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:21 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:22 | INFO     | main | Initializing database...
+2026-05-15 02:33:22 | INFO     | main | Database initialized.
+2026-05-15 02:33:22 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:22 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:22 | INFO     | main | Initializing database...
+2026-05-15 02:33:22 | INFO     | main | Database initialized.
+2026-05-15 02:33:22 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:22 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:22 | INFO     | main | Initializing database...
+2026-05-15 02:33:22 | INFO     | main | Database initialized.
+2026-05-15 02:33:22 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:22 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:23 | INFO     | main | Initializing database...
+2026-05-15 02:33:23 | INFO     | main | Database initialized.
+2026-05-15 02:33:23 | INFO     | scheduler | === Pipeline start ===
+2026-05-15 02:33:23 | INFO     | scheduler | Fetching articles...
+2026-05-15 02:33:34 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:34 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:33:37 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:37 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:33:37 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:37 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:33:37 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:37 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:33:37 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:37 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:33:37 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:37 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:33:37 | INFO     | scheduler | Inserted 1063 new articles
+2026-05-15 02:33:37 | INFO     | scheduler | Got 0 recent articles for clustering
+2026-05-15 02:33:37 | WARNING  | scheduler | No recent articles to process
+2026-05-15 02:33:37 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:37 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Fetched 1063 articles
+2026-05-15 02:33:38 | INFO     | scheduler | Cleaned 1063 articles
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:35:02 | INFO     | main | Initializing database...
+2026-05-15 02:35:02 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:41:36 | INFO     | main | Initializing database...
+2026-05-15 02:41:36 | INFO     | main | Database initialized.
+2026-05-15 02:42:25 | INFO     | main | Initializing database...
+2026-05-15 02:42:25 | INFO     | main | Database initialized.
+2026-05-15 02:42:25 | ERROR    | main | Failed to fetch news: name 'last_updated' is not defined
+Traceback (most recent call last):
+
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+    │    └ <function Thread._bootstrap_inner at 0x000002701820AB90>
+    └ <WorkerThread(AnyIO worker thread, started daemon 18956)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    │    │        │   │    └ <function WorkerThread.run at 0x000002701AE22350>
+    │    │        │   └ <WorkerThread(AnyIO worker thread, started daemon 18956)>
+    │    │        └ <method 'run' of '_contextvars.Context' objects>
+    │    └ <_contextvars.Context object at 0x000002706397ABC0>
+    └ <WorkerThread(AnyIO worker thread, started daemon 18956)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\site-packages\anyio\_backends\_asyncio.py", line 1002, in run
+    result = context.run(func, *args)
+             │       │   │      └ ()
+             │       │   └ functools.partial(<function get_news at 0x00000270637E1DD0>, force_refresh=False)
+             │       └ <method 'run' of '_contextvars.Context' objects>
+             └ <_contextvars.Context object at 0x000002706399CF00>
+
+> File "C:\Users\Adity\OneDrive\Desktop\Projects\news-dashboard\backend\tests\..\main.py", line 199, in get_news
+    "last_updated": last_updated(),
+
+NameError: name 'last_updated' is not defined
+2026-05-15 02:42:25 | INFO     | main | Initializing database...
+2026-05-15 02:42:25 | INFO     | main | Database initialized.
+2026-05-15 02:42:25 | ERROR    | main | Failed to fetch news: name 'last_updated' is not defined
+Traceback (most recent call last):
+
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+    │    └ <function Thread._bootstrap_inner at 0x000002701820AB90>
+    └ <WorkerThread(AnyIO worker thread, started daemon 24232)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    │    │        │   │    └ <function WorkerThread.run at 0x000002701AE22350>
+    │    │        │   └ <WorkerThread(AnyIO worker thread, started daemon 24232)>
+    │    │        └ <method 'run' of '_contextvars.Context' objects>
+    │    └ <_contextvars.Context object at 0x000002706394A240>
+    └ <WorkerThread(AnyIO worker thread, started daemon 24232)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\site-packages\anyio\_backends\_asyncio.py", line 1002, in run
+    result = context.run(func, *args)
+             │       │   │      └ ()
+             │       │   └ functools.partial(<function get_news at 0x00000270637E1DD0>, force_refresh=False)
+             │       └ <method 'run' of '_contextvars.Context' objects>
+             └ <_contextvars.Context object at 0x0000027063967F40>
+
+> File "C:\Users\Adity\OneDrive\Desktop\Projects\news-dashboard\backend\tests\..\main.py", line 199, in get_news
+    "last_updated": last_updated(),
+
+NameError: name 'last_updated' is not defined
+2026-05-15 02:42:25 | INFO     | main | Initializing database...
+2026-05-15 02:42:25 | INFO     | main | Database initialized.
+2026-05-15 02:42:25 | ERROR    | main | Failed to fetch news: name 'last_updated' is not defined
+Traceback (most recent call last):
+
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+    │    └ <function Thread._bootstrap_inner at 0x000002701820AB90>
+    └ <WorkerThread(AnyIO worker thread, started daemon 21676)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    │    │        │   │    └ <function WorkerThread.run at 0x000002701AE22350>
+    │    │        │   └ <WorkerThread(AnyIO worker thread, started daemon 21676)>
+    │    │        └ <method 'run' of '_contextvars.Context' objects>
+    │    └ <_contextvars.Context object at 0x0000027063A3CF00>
+    └ <WorkerThread(AnyIO worker thread, started daemon 21676)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\site-packages\anyio\_backends\_asyncio.py", line 1002, in run
+    result = context.run(func, *args)
+             │       │   │      └ ()
+             │       │   └ functools.partial(<function get_news at 0x00000270637E1DD0>, force_refresh=True)
+             │       └ <method 'run' of '_contextvars.Context' objects>
+             └ <_contextvars.Context object at 0x0000027063949000>
+
+> File "C:\Users\Adity\OneDrive\Desktop\Projects\news-dashboard\backend\tests\..\main.py", line 199, in get_news
+    "last_updated": last_updated(),
+
+NameError: name 'last_updated' is not defined
+2026-05-15 02:42:25 | INFO     | main | Initializing database...
+2026-05-15 02:42:25 | INFO     | main | Database initialized.
+2026-05-15 02:42:25 | ERROR    | main | Failed to fetch news: name 'last_updated' is not defined
+Traceback (most recent call last):
+
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+    │    └ <function Thread._bootstrap_inner at 0x000002701820AB90>
+    └ <WorkerThread(AnyIO worker thread, started daemon 4824)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    │    │        │   │    └ <function WorkerThread.run at 0x000002701AE22350>
+    │    │        │   └ <WorkerThread(AnyIO worker thread, started daemon 4824)>
+    │    │        └ <method 'run' of '_contextvars.Context' objects>
+    │    └ <_contextvars.Context object at 0x0000027063967840>
+    └ <WorkerThread(AnyIO worker thread, started daemon 4824)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\site-packages\anyio\_backends\_asyncio.py", line 1002, in run
+    result = context.run(func, *args)
+             │       │   │      └ ()
+             │       │   └ functools.partial(<function get_news at 0x00000270637E1DD0>, force_refresh=False)
+             │       └ <method 'run' of '_contextvars.Context' objects>
+             └ <_contextvars.Context object at 0x000002706397BAC0>
+
+> File "C:\Users\Adity\OneDrive\Desktop\Projects\news-dashboard\backend\tests\..\main.py", line 199, in get_news
+    "last_updated": last_updated(),
+
+NameError: name 'last_updated' is not defined
+2026-05-15 02:42:25 | INFO     | main | Initializing database...
+2026-05-15 02:42:25 | INFO     | main | Database initialized.
+2026-05-15 02:42:25 | INFO     | main | Initializing database...
+2026-05-15 02:42:25 | INFO     | main | Database initialized.
+2026-05-15 02:42:25 | INFO     | main | Initializing database...
+2026-05-15 02:42:25 | INFO     | main | Database initialized.
+2026-05-15 02:42:25 | INFO     | main | Initializing database...
+2026-05-15 02:42:25 | INFO     | main | Database initialized.
+2026-05-15 02:42:25 | INFO     | main | Initializing database...
+2026-05-15 02:42:25 | INFO     | main | Database initialized.
+2026-05-15 02:42:25 | INFO     | main | Initializing database...
+2026-05-15 02:42:25 | INFO     | main | Database initialized.
+2026-05-15 02:42:25 | INFO     | main | Initializing database...
+2026-05-15 02:42:25 | INFO     | main | Database initialized.
+2026-05-15 02:42:25 | INFO     | main | Initializing database...
+2026-05-15 02:42:25 | INFO     | main | Database initialized.
+2026-05-15 02:42:25 | INFO     | main | Initializing database...
+2026-05-15 02:42:25 | INFO     | main | Database initialized.
+2026-05-15 02:42:25 | INFO     | main | Initializing database...
+2026-05-15 02:42:25 | INFO     | main | Database initialized.
+2026-05-15 02:42:25 | INFO     | main | Initializing database...
+2026-05-15 02:42:25 | INFO     | main | Database initialized.
+2026-05-15 02:42:25 | INFO     | main | Initializing database...
+2026-05-15 02:42:25 | INFO     | main | Database initialized.
+2026-05-15 02:42:25 | INFO     | main | Initializing database...
+2026-05-15 02:42:25 | INFO     | main | Database initialized.

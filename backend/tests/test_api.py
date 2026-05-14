@@ -44,17 +44,23 @@ class TestNewsEndpoint:
 
 
 class TestHealthEndpoint:
-    """Tests for the root health check endpoint."""
+    """Tests for the root health check endpoint.
+
+    The health endpoint no longer touches the database — it returns a
+    simple status string. This prevents Render's deploy health checker
+    from failing due to transient DB connection issues.
+    """
 
     def test_health_returns_expected_keys(self, client: TestClient):
-        """GET / should return status, stories, last_updated."""
+        """GET / should return status."""
         response = client.get("/")
         assert response.status_code == 200
 
         data = response.json()
         assert "status" in data
-        assert "stories" in data
-        assert "last_updated" in data
+        # stories and last_updated are no longer returned — see Render fix
+        assert "stories" not in data
+        assert "last_updated" not in data
 
     def test_health_status_message(self, client: TestClient):
         """The health status should be a positive string."""
@@ -62,13 +68,7 @@ class TestHealthEndpoint:
         data = response.json()
         assert isinstance(data["status"], str)
         assert len(data["status"]) > 0
-
-    def test_health_stories_is_integer(self, client: TestClient):
-        """The stories count should be an integer."""
-        response = client.get("/")
-        data = response.json()
-        assert isinstance(data["stories"], int)
-        assert data["stories"] >= 0
+        assert data["status"] == "seriously operational"
 
 
 class TestSourcesEndpoint:

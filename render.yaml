@@ -7,15 +7,14 @@ services:
     dockerfilePath: ./backend/Dockerfile
     envVars:
       - key: DATABASE_URL
-        sync: false  # Set this manually — see .env.example for Supabase setup
+        sync: false  # ⚠️ REQUIRED — set this manually in Render dashboard.
+                      #    Use Supabase or Render PostgreSQL.
+                      #    See .env.example for details.
       - key: API_KEY
-        sync: false  # Set this manually — generate with: openssl rand -hex 32
+        sync: false  # Optional — set this to lock down POST endpoints.
+                      #    Generate with: openssl rand -hex 32
       - key: CORS_ORIGINS
-        value: "https://your-frontend.vercel.app"  # Change to your actual frontend URL
-      - key: PYTHON_VERSION
-        value: "3.11.0"
-      - key: PYTHONUNBUFFERED
-        value: "1"
+        value: "https://your-frontend.vercel.app"  # ⚠️ Change to your actual frontend URL
       - key: LOG_LEVEL
         value: "INFO"
     healthCheckPath: /

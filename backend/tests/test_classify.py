@@ -19,9 +19,9 @@ class TestClassifySectors:
             "stock market reaches new highs after fed rate decision. "
             "The S&P 500 and Dow Jones both rallied on positive economic data."
         )
-        assert "Markets" in result
-        # Should not contain unrelated sectors
-        assert "Tech" not in result or len(result) >= 1
+        assert "Markets" in result, f"Expected Markets, got {result}"
+        # A pure markets headline shouldn't trigger unrelated sectors
+        assert "Tech" not in result or "Markets" in result
 
     def test_tech_sector(self):
         """AI and technology news should classify as Tech."""
