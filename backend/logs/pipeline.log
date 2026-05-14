@@ -544,3 +544,271 @@ NameError: name 'last_updated' is not defined
 2026-05-15 02:42:25 | INFO     | main | Database initialized.
 2026-05-15 02:42:25 | INFO     | main | Initializing database...
 2026-05-15 02:42:25 | INFO     | main | Database initialized.
+2026-05-15 02:44:03 | INFO     | main | Initializing database...
+2026-05-15 02:44:03 | INFO     | main | Database initialized.
+2026-05-15 02:44:03 | ERROR    | main | Failed to fetch news: name 'last_updated' is not defined
+Traceback (most recent call last):
+
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+    │    └ <function Thread._bootstrap_inner at 0x00000210C83DAB90>
+    └ <WorkerThread(AnyIO worker thread, started daemon 1352)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    │    │        │   │    └ <function WorkerThread.run at 0x00000210CAFD2350>
+    │    │        │   └ <WorkerThread(AnyIO worker thread, started daemon 1352)>
+    │    │        └ <method 'run' of '_contextvars.Context' objects>
+    │    └ <_contextvars.Context object at 0x0000021093BEE540>
+    └ <WorkerThread(AnyIO worker thread, started daemon 1352)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\site-packages\anyio\_backends\_asyncio.py", line 1002, in run
+    result = context.run(func, *args)
+             │       │   │      └ ()
+             │       │   └ functools.partial(<function get_news at 0x0000021093A59C70>, force_refresh=False)
+             │       └ <method 'run' of '_contextvars.Context' objects>
+             └ <_contextvars.Context object at 0x0000021093C0C580>
+
+> File "C:\Users\Adity\OneDrive\Desktop\Projects\news-dashboard\backend\tests\..\main.py", line 199, in get_news
+    "last_updated": last_updated(),
+
+NameError: name 'last_updated' is not defined
+2026-05-15 02:44:03 | INFO     | main | Initializing database...
+2026-05-15 02:44:03 | INFO     | main | Database initialized.
+2026-05-15 02:44:03 | ERROR    | main | Failed to fetch news: name 'last_updated' is not defined
+Traceback (most recent call last):
+
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+    │    └ <function Thread._bootstrap_inner at 0x00000210C83DAB90>
+    └ <WorkerThread(AnyIO worker thread, started daemon 16568)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    │    │        │   │    └ <function WorkerThread.run at 0x00000210CAFD2350>
+    │    │        │   └ <WorkerThread(AnyIO worker thread, started daemon 16568)>
+    │    │        └ <method 'run' of '_contextvars.Context' objects>
+    │    └ <_contextvars.Context object at 0x0000021093BD3DC0>
+    └ <WorkerThread(AnyIO worker thread, started daemon 16568)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\site-packages\anyio\_backends\_asyncio.py", line 1002, in run
+    result = context.run(func, *args)
+             │       │   │      └ ()
+             │       │   └ functools.partial(<function get_news at 0x0000021093A59C70>, force_refresh=False)
+             │       └ <method 'run' of '_contextvars.Context' objects>
+             └ <_contextvars.Context object at 0x0000021093BD3740>
+
+> File "C:\Users\Adity\OneDrive\Desktop\Projects\news-dashboard\backend\tests\..\main.py", line 199, in get_news
+    "last_updated": last_updated(),
+
+NameError: name 'last_updated' is not defined
+2026-05-15 02:44:03 | INFO     | main | Initializing database...
+2026-05-15 02:44:03 | INFO     | main | Database initialized.
+2026-05-15 02:44:03 | ERROR    | main | Failed to fetch news: name 'last_updated' is not defined
+Traceback (most recent call last):
+
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+    │    └ <function Thread._bootstrap_inner at 0x00000210C83DAB90>
+    └ <WorkerThread(AnyIO worker thread, started daemon 17936)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    │    │        │   │    └ <function WorkerThread.run at 0x00000210CAFD2350>
+    │    │        │   └ <WorkerThread(AnyIO worker thread, started daemon 17936)>
+    │    │        └ <method 'run' of '_contextvars.Context' objects>
+    │    └ <_contextvars.Context object at 0x0000021093BEE780>
+    └ <WorkerThread(AnyIO worker thread, started daemon 17936)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\site-packages\anyio\_backends\_asyncio.py", line 1002, in run
+    result = context.run(func, *args)
+             │       │   │      └ ()
+             │       │   └ functools.partial(<function get_news at 0x0000021093A59C70>, force_refresh=True)
+             │       └ <method 'run' of '_contextvars.Context' objects>
+             └ <_contextvars.Context object at 0x0000021093BC43C0>
+
+> File "C:\Users\Adity\OneDrive\Desktop\Projects\news-dashboard\backend\tests\..\main.py", line 199, in get_news
+    "last_updated": last_updated(),
+
+NameError: name 'last_updated' is not defined
+2026-05-15 02:44:03 | INFO     | main | Initializing database...
+2026-05-15 02:44:03 | INFO     | main | Database initialized.
+2026-05-15 02:44:03 | ERROR    | main | Failed to fetch news: name 'last_updated' is not defined
+Traceback (most recent call last):
+
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+    │    └ <function Thread._bootstrap_inner at 0x00000210C83DAB90>
+    └ <WorkerThread(AnyIO worker thread, started daemon 11992)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    │    │        │   │    └ <function WorkerThread.run at 0x00000210CAFD2350>
+    │    │        │   └ <WorkerThread(AnyIO worker thread, started daemon 11992)>
+    │    │        └ <method 'run' of '_contextvars.Context' objects>
+    │    └ <_contextvars.Context object at 0x0000021093BC6880>
+    └ <WorkerThread(AnyIO worker thread, started daemon 11992)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\site-packages\anyio\_backends\_asyncio.py", line 1002, in run
+    result = context.run(func, *args)
+             │       │   │      └ ()
+             │       │   └ functools.partial(<function get_news at 0x0000021093A59C70>, force_refresh=False)
+             │       └ <method 'run' of '_contextvars.Context' objects>
+             └ <_contextvars.Context object at 0x0000021093BEE540>
+
+> File "C:\Users\Adity\OneDrive\Desktop\Projects\news-dashboard\backend\tests\..\main.py", line 199, in get_news
+    "last_updated": last_updated(),
+
+NameError: name 'last_updated' is not defined
+2026-05-15 02:44:03 | INFO     | main | Initializing database...
+2026-05-15 02:44:03 | INFO     | main | Database initialized.
+2026-05-15 02:44:03 | INFO     | main | Initializing database...
+2026-05-15 02:44:03 | INFO     | main | Database initialized.
+2026-05-15 02:44:03 | INFO     | main | Initializing database...
+2026-05-15 02:44:03 | INFO     | main | Database initialized.
+2026-05-15 02:44:03 | INFO     | main | Initializing database...
+2026-05-15 02:44:03 | INFO     | main | Database initialized.
+2026-05-15 02:44:03 | INFO     | main | Initializing database...
+2026-05-15 02:44:03 | INFO     | main | Database initialized.
+2026-05-15 02:44:03 | INFO     | main | Initializing database...
+2026-05-15 02:44:03 | INFO     | main | Database initialized.
+2026-05-15 02:44:03 | INFO     | main | Initializing database...
+2026-05-15 02:44:03 | INFO     | main | Database initialized.
+2026-05-15 02:44:03 | INFO     | main | Initializing database...
+2026-05-15 02:44:03 | INFO     | main | Database initialized.
+2026-05-15 02:44:03 | INFO     | main | Initializing database...
+2026-05-15 02:44:03 | INFO     | main | Database initialized.
+2026-05-15 02:44:03 | INFO     | main | Initializing database...
+2026-05-15 02:44:03 | INFO     | main | Database initialized.
+2026-05-15 02:44:03 | INFO     | main | Initializing database...
+2026-05-15 02:44:03 | INFO     | main | Database initialized.
+2026-05-15 02:44:03 | INFO     | main | Initializing database...
+2026-05-15 02:44:03 | INFO     | main | Database initialized.
+2026-05-15 02:44:03 | INFO     | main | Initializing database...
+2026-05-15 02:44:03 | INFO     | main | Database initialized.
+2026-05-15 03:14:18 | INFO     | main | Initializing database...
+2026-05-15 03:14:18 | INFO     | main | Database initialized.
+2026-05-15 03:14:18 | ERROR    | main | Failed to fetch news: name 'last_updated' is not defined
+Traceback (most recent call last):
+
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+    │    └ <function Thread._bootstrap_inner at 0x00000216AE6DAB90>
+    └ <WorkerThread(AnyIO worker thread, started daemon 25684)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    │    │        │   │    └ <function WorkerThread.run at 0x00000216B1302350>
+    │    │        │   └ <WorkerThread(AnyIO worker thread, started daemon 25684)>
+    │    │        └ <method 'run' of '_contextvars.Context' objects>
+    │    └ <_contextvars.Context object at 0x00000216F9F0CB00>
+    └ <WorkerThread(AnyIO worker thread, started daemon 25684)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\site-packages\anyio\_backends\_asyncio.py", line 1002, in run
+    result = context.run(func, *args)
+             │       │   │      └ ()
+             │       │   └ functools.partial(<function get_news at 0x00000216F9D55C70>, force_refresh=False)
+             │       └ <method 'run' of '_contextvars.Context' objects>
+             └ <_contextvars.Context object at 0x00000216F9F0CBC0>
+
+> File "C:\Users\Adity\OneDrive\Desktop\Projects\news-dashboard\backend\tests\..\main.py", line 199, in get_news
+    "last_updated": last_updated(),
+
+NameError: name 'last_updated' is not defined
+2026-05-15 03:14:18 | INFO     | main | Initializing database...
+2026-05-15 03:14:18 | INFO     | main | Database initialized.
+2026-05-15 03:14:18 | ERROR    | main | Failed to fetch news: name 'last_updated' is not defined
+Traceback (most recent call last):
+
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+    │    └ <function Thread._bootstrap_inner at 0x00000216AE6DAB90>
+    └ <WorkerThread(AnyIO worker thread, started daemon 9104)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    │    │        │   │    └ <function WorkerThread.run at 0x00000216B1302350>
+    │    │        │   └ <WorkerThread(AnyIO worker thread, started daemon 9104)>
+    │    │        └ <method 'run' of '_contextvars.Context' objects>
+    │    └ <_contextvars.Context object at 0x00000216F9EEC400>
+    └ <WorkerThread(AnyIO worker thread, started daemon 9104)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\site-packages\anyio\_backends\_asyncio.py", line 1002, in run
+    result = context.run(func, *args)
+             │       │   │      └ ()
+             │       │   └ functools.partial(<function get_news at 0x00000216F9D55C70>, force_refresh=False)
+             │       └ <method 'run' of '_contextvars.Context' objects>
+             └ <_contextvars.Context object at 0x00000216F9ED3E00>
+
+> File "C:\Users\Adity\OneDrive\Desktop\Projects\news-dashboard\backend\tests\..\main.py", line 199, in get_news
+    "last_updated": last_updated(),
+
+NameError: name 'last_updated' is not defined
+2026-05-15 03:14:18 | INFO     | main | Initializing database...
+2026-05-15 03:14:18 | INFO     | main | Database initialized.
+2026-05-15 03:14:18 | ERROR    | main | Failed to fetch news: name 'last_updated' is not defined
+Traceback (most recent call last):
+
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+    │    └ <function Thread._bootstrap_inner at 0x00000216AE6DAB90>
+    └ <WorkerThread(AnyIO worker thread, started daemon 22948)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    │    │        │   │    └ <function WorkerThread.run at 0x00000216B1302350>
+    │    │        │   └ <WorkerThread(AnyIO worker thread, started daemon 22948)>
+    │    │        └ <method 'run' of '_contextvars.Context' objects>
+    │    └ <_contextvars.Context object at 0x00000216F9ED3D40>
+    └ <WorkerThread(AnyIO worker thread, started daemon 22948)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\site-packages\anyio\_backends\_asyncio.py", line 1002, in run
+    result = context.run(func, *args)
+             │       │   │      └ ()
+             │       │   └ functools.partial(<function get_news at 0x00000216F9D55C70>, force_refresh=True)
+             │       └ <method 'run' of '_contextvars.Context' objects>
+             └ <_contextvars.Context object at 0x00000216F9DCFA80>
+
+> File "C:\Users\Adity\OneDrive\Desktop\Projects\news-dashboard\backend\tests\..\main.py", line 199, in get_news
+    "last_updated": last_updated(),
+
+NameError: name 'last_updated' is not defined
+2026-05-15 03:14:18 | INFO     | main | Initializing database...
+2026-05-15 03:14:18 | INFO     | main | Database initialized.
+2026-05-15 03:14:18 | ERROR    | main | Failed to fetch news: name 'last_updated' is not defined
+Traceback (most recent call last):
+
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+    │    └ <function Thread._bootstrap_inner at 0x00000216AE6DAB90>
+    └ <WorkerThread(AnyIO worker thread, started daemon 27716)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    │    │        │   │    └ <function WorkerThread.run at 0x00000216B1302350>
+    │    │        │   └ <WorkerThread(AnyIO worker thread, started daemon 27716)>
+    │    │        └ <method 'run' of '_contextvars.Context' objects>
+    │    └ <_contextvars.Context object at 0x00000216F9EC96C0>
+    └ <WorkerThread(AnyIO worker thread, started daemon 27716)>
+  File "C:\Users\Adity\AppData\Local\Programs\Python\Python314\Lib\site-packages\anyio\_backends\_asyncio.py", line 1002, in run
+    result = context.run(func, *args)
+             │       │   │      └ ()
+             │       │   └ functools.partial(<function get_news at 0x00000216F9D55C70>, force_refresh=False)
+             │       └ <method 'run' of '_contextvars.Context' objects>
+             └ <_contextvars.Context object at 0x00000216F66C0500>
+
+> File "C:\Users\Adity\OneDrive\Desktop\Projects\news-dashboard\backend\tests\..\main.py", line 199, in get_news
+    "last_updated": last_updated(),
+
+NameError: name 'last_updated' is not defined
+2026-05-15 03:14:18 | INFO     | main | Initializing database...
+2026-05-15 03:14:18 | INFO     | main | Database initialized.
+2026-05-15 03:14:18 | INFO     | main | Initializing database...
+2026-05-15 03:14:18 | INFO     | main | Database initialized.
+2026-05-15 03:14:18 | INFO     | main | Initializing database...
+2026-05-15 03:14:18 | INFO     | main | Database initialized.
+2026-05-15 03:14:18 | INFO     | main | Initializing database...
+2026-05-15 03:14:18 | INFO     | main | Database initialized.
+2026-05-15 03:14:18 | INFO     | main | Initializing database...
+2026-05-15 03:14:18 | INFO     | main | Database initialized.
+2026-05-15 03:14:18 | INFO     | main | Initializing database...
+2026-05-15 03:14:18 | INFO     | main | Database initialized.
+2026-05-15 03:14:19 | INFO     | main | Initializing database...
+2026-05-15 03:14:19 | INFO     | main | Database initialized.
+2026-05-15 03:14:19 | INFO     | main | Initializing database...
+2026-05-15 03:14:19 | INFO     | main | Database initialized.
+2026-05-15 03:14:19 | INFO     | main | Initializing database...
+2026-05-15 03:14:19 | INFO     | main | Database initialized.
+2026-05-15 03:14:19 | INFO     | main | Initializing database...
+2026-05-15 03:14:19 | INFO     | main | Database initialized.
+2026-05-15 03:14:19 | INFO     | main | Initializing database...
+2026-05-15 03:14:19 | INFO     | main | Database initialized.
+2026-05-15 03:14:19 | INFO     | main | Initializing database...
+2026-05-15 03:14:19 | INFO     | main | Database initialized.
+2026-05-15 03:14:19 | INFO     | main | Initializing database...
+2026-05-15 03:14:19 | INFO     | main | Database initialized.

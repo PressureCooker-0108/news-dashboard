@@ -4,7 +4,7 @@ services:
     runtime: image
     region: oregon
     plan: free
-    dockerfilePath: ./backend/Dockerfile
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: DATABASE_URL
         sync: false  # ⚠️ REQUIRED — set this manually in Render dashboard.
