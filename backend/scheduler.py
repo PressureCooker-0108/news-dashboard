@@ -70,6 +70,12 @@ def run_pipeline() -> None:
             db = SessionLocal()
             logger.info(f"Got {len(recent)} recent articles for clustering")
 
+            # Limit articles to prevent OOM on Render's free tier (512 MB RAM)
+            MAX_ARTICLES = 250
+            if len(recent) > MAX_ARTICLES:
+                logger.info(f"Limiting to {MAX_ARTICLES} articles for clustering (had {len(recent)})")
+                recent = recent[:MAX_ARTICLES]
+
             if not recent:
                 logger.warning("No recent articles to process")
                 return
