@@ -61,6 +61,9 @@ def run_pipeline() -> None:
             inserted = save_articles(articles, db=db)
             logger.info(f"Inserted {inserted} new articles")
 
+            # Commit articles before closing this session so get_recent_articles can see them
+            db.commit()
+
             # 4. Get recent articles for clustering (separate session — read-only)
             db.close()
             recent = get_recent_articles(hours=24)
