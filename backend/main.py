@@ -139,9 +139,13 @@ async def lifespan(app: FastAPI):
     # Skip scheduler in test mode
     if not os.environ.get("_TESTING"):
         # Start APScheduler (pipeline runs every 6 hours)
-        # NOT running the full pipeline on startup — it causes OOM on Render's
-        # free tier (512 MB). The scheduler handles it.
         start_scheduler()
+
+        # Run the pipeline once on startup so data is ready immediately.
+        # Runs in a background thread so the server starts up without delay.
+        # The MAX_ARTICLES=250 limit prevents OOM on Render's free tier (512 MB).
+        threading.Thread(target=run_pipeline, daemon=True).start()
+        logger.info("Startup pipeline triggered in background thread")
 
     yield
 
@@ -478,7 +482,8 @@ def test_fetch():
 
 
 
-@app.get("/pipeline/db-status")def db_status():
+@app.get("/pipeline/db-status")
+def db_status():
     """Diagnostic: check database article and story counts."""
     try:
         from models.database import SessionLocal
