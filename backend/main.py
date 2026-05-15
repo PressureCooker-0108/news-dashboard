@@ -14,7 +14,8 @@ from loguru import logger as loguru_logger
 from models.database import (
     init_db, get_top_stories,
     get_stories_by_sector, get_market_data, get_latest_briefing,
-    get_source_diversity, get_trending_topics, get_sector_summaries
+    get_source_diversity, get_trending_topics, get_sector_summaries,
+    last_updated
 )
 from scheduler import run_pipeline, start_scheduler
 from services.market_data import fetch_and_store_market_data, get_big_market_movers
