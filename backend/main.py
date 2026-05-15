@@ -456,6 +456,27 @@ def trigger_pipeline():
         return {"status": "error", "detail": str(e)}
 
 
+@app.get("/pipeline/test-fetch")
+def test_fetch():
+    """Diagnostic: test RSS feed fetching without running the full pipeline.
+    Resets the pipeline rate limiter so you can trigger it after."""
+    try:
+        from services.fetch_news import fetch_rss_feeds, RSS_SOURCES
+        articles = fetch_rss_feeds()
+        # Reset pipeline rate limiter so we can trigger a fresh run
+        _limiter.reset("pipeline")
+        return {
+            "feeds_configured": len(RSS_SOURCES),
+            "articles_fetched": len(articles),
+            "sample_articles": [
+                {"title": a["title"][:80], "source": a["source"]}
+                for a in articles[:5]
+            ],
+        }
+    except Exception as e:
+        return {"error": str(e), "detail": "Fetch failed"}
+
+
 # ── Main ──
 
 if __name__ == "__main__":
