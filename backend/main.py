@@ -477,6 +477,25 @@ def test_fetch():
         return {"error": str(e), "detail": "Fetch failed"}
 
 
+
+@app.get("/pipeline/db-status")def db_status():
+    """Diagnostic: check database article and story counts."""
+    try:
+        from models.database import SessionLocal
+        from models.models import Article, Summary
+        db = SessionLocal()
+        try:
+            article_count = db.query(Article).count()
+            story_count = db.query(Summary).count()
+            return {
+                "articles": article_count,
+                "stories": story_count,
+            }
+        finally:
+            db.close()
+    except Exception as e:
+        return {"error": str(e)}
+
 # ── Main ──
 
 if __name__ == "__main__":
