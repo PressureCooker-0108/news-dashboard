@@ -10,19 +10,29 @@ RSS_FEEDS = [
     # Global News
     "https://feeds.bbci.co.uk/news/rss.xml",
     "https://feeds.bbci.co.uk/news/world/rss.xml",
+    "https://feeds.bbci.co.uk/news/technology/rss.xml",
     "https://www.aljazeera.com/xml/rss/all.xml",
     "https://feeds.npr.org/1001/rss.xml",
     "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
     "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+    "https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml",
+    "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml",
+    "https://rss.nytimes.com/services/xml/rss/nyt/Economy.xml",
     # Business & Markets
     "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114",
     "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664",
     "https://feeds.marketwatch.com/marketwatch/topstories/",
     "https://www.investing.com/rss/news.rss",
+    "https://feeds.npr.org/1014/rss.xml",
+    "https://feeds.washingtonpost.com/rss/national",
     # Tech
     "https://techcrunch.com/feed/",
     "https://news.ycombinator.com/rss",
     "https://www.wired.com/feed/rss",
+    # Europe / UK
+    "https://www.theguardian.com/world/rss",
+    "https://www.theguardian.com/business/rss",
+    "https://www.theguardian.com/uk/rss",
     # India
     "https://www.thehindu.com/news/international/?service=rss",
     "https://feeds.feedburner.com/ndtvnews-top-stories",
