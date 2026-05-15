@@ -1,4 +1,6 @@
 import logging
+import random
+import time
 import yfinance as yf
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
@@ -18,7 +20,6 @@ WATCHLIST = [
     {"ticker": "AAPL", "name": "Apple", "sector": "Tech"},
     {"ticker": "MSFT", "name": "Microsoft", "sector": "Tech"},
     {"ticker": "GOOGL", "name": "Alphabet", "sector": "Tech"},
-    # AMZN listed under Consumer below
     {"ticker": "NVDA", "name": "NVIDIA", "sector": "Tech"},
     {"ticker": "META", "name": "Meta", "sector": "Tech"},
     {"ticker": "TSLA", "name": "Tesla", "sector": "Tech"},
@@ -52,67 +53,96 @@ WATCHLIST = [
     {"ticker": "EEM", "name": "iShares MSCI Emerging Markets", "sector": "Markets"},
 ]
 
+MAX_RETRIES = 3
+RETRY_DELAY_S = 1.5
+
+
+def _is_index(ticker: str) -> bool:
+    """Check if a ticker is a market index (starts with ^)."""
+    return ticker.startswith("^")
+
+
+def _format_market_cap(market_cap: float | None) -> str | None:
+    """Format a market cap number into a human-readable string."""
+    if not market_cap:
+        return None
+    if market_cap >= 1e12:
+        return f"${market_cap / 1e12:.2f}T"
+    elif market_cap >= 1e9:
+        return f"${market_cap / 1e9:.2f}B"
+    elif market_cap >= 1e6:
+        return f"${market_cap / 1e6:.2f}M"
+    else:
+        return f"${market_cap:,.0f}"
+
 
 def _fetch_one(item: dict) -> dict | None:
-    """Fetch market data for a single ticker. This runs in a worker thread."""
-    try:
-        ticker = yf.Ticker(item["ticker"])
-        info = ticker.info if ticker.info else {}
+    """Fetch market data for a single ticker with retries. Runs in a worker thread."""
+    ticker_symbol = item["ticker"]
 
-        price = info.get("regularMarketPrice") or info.get("currentPrice") or info.get("previousClose") or 0
-        prev_close = info.get("regularMarketPreviousClose") or info.get("previousClose") or price
+    for attempt in range(MAX_RETRIES):
+        try:
+            # Add jitter to avoid thundering herd
+            if attempt > 0:
+                time.sleep(RETRY_DELAY_S * attempt + random.uniform(0, 0.5))
 
-        if price and prev_close and prev_close > 0:
-            change = round(price - prev_close, 2)
-            change_pct = round((change / prev_close) * 100, 2)
-        else:
-            # Fallback to fast_info
-            try:
-                fast = ticker.fast_info
-                price = fast.get("lastPrice", 0)
-                prev_close = fast.get("previousClose", 0) or price
-                change = round(price - prev_close, 2)
-                change_pct = round((change / prev_close) * 100, 2) if prev_close > 0 else 0
-            except Exception:
+            ticker = yf.Ticker(ticker_symbol)
+            # Try to get info dict (contains currentPrice, marketCap, etc.)
+            info = ticker.info if ticker.info else {}
+
+            if not info or info == {}:
+                # yfinance may return an empty dict when rate-limited
+                if attempt < MAX_RETRIES - 1:
+                    continue
                 return None
 
-        market_cap = info.get("marketCap")
-        if market_cap:
-            if market_cap >= 1e12:
-                cap_str = f"${market_cap/1e12:.2f}T"
-            elif market_cap >= 1e9:
-                cap_str = f"${market_cap/1e9:.2f}B"
-            elif market_cap >= 1e6:
-                cap_str = f"${market_cap/1e6:.2f}M"
+            price = info.get("regularMarketPrice") or info.get("currentPrice") or info.get("previousClose") or 0
+            prev_close = info.get("regularMarketPreviousClose") or info.get("previousClose") or price
+
+            if price and prev_close and prev_close > 0:
+                change = round(price - prev_close, 2)
+                change_pct = round((change / prev_close) * 100, 2)
             else:
-                cap_str = f"${market_cap:,.0f}"
-        else:
-            cap_str = None
+                # Fallback to fast_info if info is sparse (common for indices)
+                try:
+                    fast = ticker.fast_info
+                    price = fast.get("lastPrice", 0)
+                    prev_close = fast.get("previousClose", 0) or price
+                    change = round(price - prev_close, 2)
+                    change_pct = round((change / prev_close) * 100, 2) if prev_close > 0 else 0
+                except Exception:
+                    if attempt < MAX_RETRIES - 1:
+                        continue
+                    return None
 
-        return {
-            "ticker": item["ticker"],
-            "name": item["name"],
-            "price": round(price, 2) if price else 0,
-            "change": change,
-            "change_pct": change_pct,
-            "market_cap": cap_str,
-            "sector": item["sector"],
-        }
+            return {
+                "ticker": ticker_symbol,
+                "name": item["name"],
+                "price": round(price, 2) if price else 0,
+                "change": change,
+                "change_pct": change_pct,
+                "market_cap": _format_market_cap(info.get("marketCap")),
+                "sector": item["sector"],
+            }
 
-    except Exception:
-        return None
+        except Exception:
+            if attempt < MAX_RETRIES - 1:
+                continue
+            return None
+
+    return None
 
 
 def fetch_and_store_market_data() -> list[dict]:
     """Fetch stock prices for all watchlist tickers in parallel and store in DB.
 
-    Uses a ThreadPoolExecutor (10 workers) to parallelize I/O-bound yfinance
-    API calls — drops fetch time from ~30s to ~3-5s for 33 tickers.
+    Uses a ThreadPoolExecutor (8 workers) to parallelize I/O-bound yfinance
+    API calls. Each ticker gets up to 3 retries with jittered delays.
     """
     results: list[dict] = []
     errors: list[str] = []
 
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=8) as executor:
         future_map = {executor.submit(_fetch_one, item): item for item in WATCHLIST}
 
         for future in as_completed(future_map):
@@ -140,14 +170,20 @@ def fetch_and_store_market_data() -> list[dict]:
     return results
 
 
-def get_big_market_movers(threshold: float = 1.5) -> dict:
-    """Get significant market movers (stocks with > threshold% change)."""
+def get_big_market_movers(threshold: float = 0.75) -> dict:
+    """Get significant market movers (stocks with > threshold% change).
+
+    Indices are identified by tickers starting with '^'. Lowered from 1.5%
+    to 0.75% so data shows on calm market days.
+    """
     data = get_market_data()
 
-    gainers = [d for d in data if d["change_pct"] >= threshold and d["sector"] != "Index"]
-    losers = [d for d in data if d["change_pct"] <= -threshold and d["sector"] != "Index"]
+    # Exclude indices from gainers/losers using the ^ prefix check
+    gainers = [d for d in data if d["change_pct"] >= threshold and not _is_index(d["ticker"])]
+    losers = [d for d in data if d["change_pct"] <= -threshold and not _is_index(d["ticker"])]
 
-    indices = [d for d in data if d["sector"] == "Index"]
+    # Include any ticker whose sector is 'Index' OR whose ticker starts with ^
+    indices = [d for d in data if d["sector"] == "Index" or _is_index(d["ticker"])]
 
     return {
         "gainers": sorted(gainers, key=lambda x: -x["change_pct"])[:10],
