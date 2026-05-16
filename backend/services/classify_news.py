@@ -427,13 +427,12 @@ def classify_sectors(combined_text: str, source_sectors: list[str] | None = None
     """Classify news text into 1-3 sectors using deterministic keyword matching.
 
     Uses a two-tier approach:
-      1. **Source-assigned sectors** (from RSS feed config) — validated against
-         keyword matches. A source sector is only kept if the article text
-         contains at least one keyword from that sector's list. This prevents
-         bogus assignments like "Mexican cartel → India" just because it came
-         from Times of India.
-      2. **Keyword-based classification** — runs on every article and provides
-         a fallback when source tags are invalid.
+      1. **Source-assigned sectors** (from RSS feed config) — always trusted
+         and included in results. Source sectors are reliably assigned per-feed
+         in the RSS_SOURCES config, so they take precedence over keywords.
+      2. **Keyword-based classification** — runs on every article to ADD
+         secondary sectors that source tags might have missed. Sectors scoring
+         >= 30% of the top keyword score are appended.
 
     Args:
         combined_text: title + description/snippet combined text
@@ -451,23 +450,16 @@ def classify_sectors(combined_text: str, source_sectors: list[str] | None = None
     # Compute keyword match scores
     scores = _compute_sector_scores(combined_text)
 
-    # If source sectors exist, validate each against keyword matches
+    # If source sectors exist, always include them (they come from the
+    # trusted RSS_SOURCES config, not the polluted DB). Use keyword matching
+    # only to ADD additional sectors that the source tag might have missed.
     if source_sectors and len(source_sectors) > 0:
-        top_score = max(scores.values()) if scores else 0
-        validated = [
-            s for s in source_sectors
-            if top_score > 0 and scores.get(s, 0) >= 0.15 * top_score
-        ]
-
-        if validated:
-            # Source tags validated — combine with keyword-based results
-            # to catch secondary sectors the source tag might have missed
-            best = _get_best_sectors(scores, threshold=0.3)
-            # Add validated source sectors first, then keyword-suggested extras
-            combined = list(dict.fromkeys(validated + [s for s in best if s not in validated]))
-            result = combined[:3]
-            _classification_cache[cache_key] = result
-            return result
+        best = _get_best_sectors(scores, threshold=0.3)
+        # Combine source sectors with keyword-best sectors, deduped
+        combined = list(dict.fromkeys(source_sectors + [s for s in best if s not in source_sectors]))
+        result = combined[:3]
+        _classification_cache[cache_key] = result
+        return result
 
         # All source sectors failed validation (e.g. Mexican cartel from
         # Times of India → "India" has zero keyword matches) — fall through
