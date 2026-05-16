@@ -16,7 +16,7 @@ This is not a traditional news website. It's a **decision-support tool** that an
 
 ```
 ┌─────────────┐     ┌──────────────────┐     ┌──────────────┐
-│  16+ RSS    │ ──▶ │  Backend API     │ ──▶ │  Next.js     │
+│  26+ RSS    │ ──▶ │  Backend API     │ ──▶ │  Next.js     │
 │  Sources    │     │  FastAPI +       │     │  Frontend    │
 │             │     │  PostgreSQL      │     │  (Vercel)    │
 └─────────────┘     └──────────────────┘     └──────────────┘
@@ -35,10 +35,10 @@ This is not a traditional news website. It's a **decision-support tool** that an
 
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
-| API | FastAPI + Uvicorn | REST endpoints for news, markets, briefings |
-| Database | SQLAlchemy + PostgreSQL/SQLite | Story storage, market data, briefings |
+| API | FastAPI + Uvicorn | REST endpoints for news, markets, briefings, reviews |
+| Database | SQLAlchemy + PostgreSQL/SQLite | Story storage, market data, briefings, reviews |
 | Pipeline | APScheduler (6h interval) | RSS fetch → TF-IDF dedup + HDBSCAN cluster → rank → classify → summarize |
-| Services | 8 service modules | Fetch, clean, cluster, classify, rank, summarize, markets, briefing, PDF |
+| Services | 9 service modules | Fetch, clean, cluster, classify, rank, summarize, markets, briefing, PDF |
 | Container | Docker (multi-stage) | Single uvicorn worker for 512MB RAM free tier |
 
 ### Frontend (Next.js/TypeScript)
@@ -58,7 +58,7 @@ This is not a traditional news website. It's a **decision-support tool** that an
 # 1. Start everything with Docker
 docker compose up -d
 
-# 2. Run the pipeline (fetches 16+ RSS sources)
+# 2. Run the pipeline (fetches 26+ RSS sources)
 curl -X POST http://localhost:8001/pipeline/run
 
 # 3. Open the dashboard
@@ -67,6 +67,16 @@ open http://localhost:3000
 # Or run frontend separately:
 cd frontend && npm install && npm run dev
 ```
+
+## Features
+
+- **26+ RSS sources** across global news, tech, business, energy, India, and sports
+- **7 intelligence sectors**: Markets, Tech, Geopolitics, Energy, India, Sports, General
+- **TF-IDF clustering** — no external ML models, instant startup, works in 512MB RAM
+- **4-factor ranking** — coverage, recency, source authority, source diversity
+- **Automated briefings** — Markdown + PDF executive summaries
+- **Market data** — 33 tickers via yfinance, refreshed every pipeline run
+- **Story reviews** — users can flag incorrect sectors, rate summaries, and report missing images
 
 ## Deployment
 
@@ -88,6 +98,8 @@ See [`frontend/AGENTS.md`](frontend/AGENTS.md) for the complete AI-readable proj
 | GET | `/news/sectors` | List of active sectors |
 | GET | `/news/sector/{sector}` | Stories filtered by sector |
 | GET | `/news/sector-summaries` | Per-sector AI summaries |
+| GET | `/news/reviews` | All submitted story reviews |
+| POST | `/news/reviews` | Submit a story review (public) |
 | GET | `/markets` | Market data (indices, gainers, losers) |
 | POST | `/markets/refresh` | Refresh market data (rate-limited) |
 | GET | `/briefing` | Latest executive briefing |
@@ -101,12 +113,10 @@ See [`frontend/AGENTS.md`](frontend/AGENTS.md) for the complete AI-readable proj
 
 ## Environment Variables
 
-See [`.env.example`](.env.example) for the full list with documentation.
-
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `DATABASE_URL` | For production | PostgreSQL connection string |
-| `API_KEY` | Recommended | Auth for POST endpoints |
+| `API_KEY` | Recommended | Auth for POST endpoints (except `/news/reviews`) |
 | `CORS_ORIGINS` | For production | Frontend URL for CORS |
 | `LOG_LEVEL` | No | Default: INFO |
 | `NEXT_PUBLIC_API_URL` | For frontend | Backend URL |

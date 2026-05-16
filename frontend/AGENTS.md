@@ -51,7 +51,7 @@ This document is a comprehensive reference of the **Serious Operator News Dashbo
 
 ## 1. Project Overview
 
-The **Serious Operator News Dashboard** aggregates news from 16+ global RSS sources, deduplicates and clusters similar articles, classifies them into 6 intelligence sectors, ranks them by importance, generates summaries with "why it matters" analysis, provides market data via yfinance, and serves everything through a clean API and a Next.js frontend.
+The **Serious Operator News Dashboard** aggregates news from 26+ global RSS sources, deduplicates and clusters similar articles, classifies them into 7 intelligence sectors (Markets, Tech, Geopolitics, Energy, India, Sports, General), ranks them by importance, generates summaries with "why it matters" analysis, provides market data via yfinance, collects user story reviews for fine-tuning, and serves everything through a clean API and a Next.js frontend.
 
 **Target users:** Founders, investors, analysts, and curious high-agency individuals.
 
@@ -106,7 +106,7 @@ The **Serious Operator News Dashboard** aggregates news from 16+ global RSS sour
 ┌─────────────────────────────────────────────────────────────┐
 │               DATABASE (PostgreSQL / SQLite)                  │
 │  Tables: articles, clusters, stories, market_data,           │
-│          briefings, sector_summaries                          │
+│          briefings, sector_summaries, story_reviews                          │
 └──────────────────────────┬───────────────────────────────────┘
                            │
                            ▼
@@ -120,7 +120,7 @@ The **Serious Operator News Dashboard** aggregates news from 16+ global RSS sour
 │  │  ├─ Big Story (featured hero card)                   │   │
 │  │  ├─ Market Dashboard (indices, chart, gainers/losers)│   │
 │  │  ├─ Sector Heatmap (visual grid)                     │   │
-│  │  ├─ Sector Navigation (6 sector cards)               │   │
+│  │  ├─ Sector Navigation (7 sector cards)               │   │
 │  │  ├─ Top Stories (bento grid, 6 stories)              │   │
 │  │  └─ Sector Breakdown (3-col grid)                    │   │
 │  │                                                      │   │
@@ -193,7 +193,8 @@ The **Serious Operator News Dashboard** aggregates news from 16+ global RSS sour
 │       ├── news/
 │       │   ├── BigStory.tsx         # Featured hero story card
 │       │   ├── TopStories.tsx       # Bento grid layout (6 stories)
-│       │   ├── StoryCard.tsx        # Story card with Dialog for details
+│       │   ├── StoryCard.tsx        # Story card with Dialog for details + StoryReview form
+│       │   ├── StoryReview.tsx       # Collapsible review form (section, summary, image feedback)
 │       │   └── SectorSection.tsx    # Sector breakdown grid
 │       └── ui/              # shadcn/ui components (~40 components)
 │           ├── accordion.tsx, alert.tsx, badge.tsx, button.tsx,
@@ -257,6 +258,8 @@ CACHE_TTL = 300  # 5 minutes
 | GET | `/sources` | Source diversity | No | No |
 | GET | `/trending` | Trending topics | No | No |
 | POST | `/pipeline/run` | Trigger pipeline | Yes (1/60s) | No |
+| POST | `/news/reviews` | Submit story review (public) | No | No |
+| GET | `/news/reviews` | Get all submitted reviews | No | No |
 
 **Health check** (`GET /`):
 ```python
@@ -361,6 +364,8 @@ else:
 | `get_sector_summaries()` | All sector summaries |
 | `get_source_diversity()` | Article source counts for last 24h |
 | `get_trending_topics(hours)` | Top stories by score within time window |
+| `save_review(data)` | Save a user story review |
+| `get_reviews()` | Get all submitted reviews |
 
 ---
 
@@ -432,6 +437,21 @@ class Briefing(Base):
     __tablename__ = "briefings"
     id: int
     content: str             # Full Markdown text
+    created_at: str
+```
+
+**Table: `story_reviews`** (new!)
+```python
+class StoryReview(Base):
+    __tablename__ = "story_reviews"
+    id: str                  # UUID (primary key)
+    story_title: str
+    story_url: Optional[str]
+    correct_section: str     # "yes" or "no"
+    suggested_section: Optional[str]  # Sector user suggested if "no"
+    summary_concise: str     # "yes" or "no"
+    picture_available: str   # "yes" or "no"
+    comment: Optional[str]   # Free-text feedback
     created_at: str
 ```
 
@@ -827,7 +847,13 @@ The featured story — largest element on the page:
 
 **`StoryCard.tsx`** — Card with dialog:
 - Card shows: headline, summary (3-line clamp), "Context:" (why_it_matters, 2-line clamp italic)
-- Clicking opens a Dialog with: sector badges, score badge, source count, full summary, "Why It Matters" box, and "View original source" link
+- Clicking opens a Dialog with: sector badges, score badge, source count, full summary, "Why It Matters" box, "View original source" link, and a collapsible **StoryReview** form at the bottom where users can:
+- Flag whether the story is in the correct sector (with suggested sector dropdown)
+- Rate if the summary is concise
+- Confirm whether the image/article is available
+- Leave free-text feedback
+
+All reviews are saved via `POST /news/reviews` (public endpoint, no API key required).
 
 ### 5.5 Components: `SectorSection.tsx`
 
@@ -883,6 +909,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8001"
 | `downloadMarkdown()` | GET `/export/markdown` | Opens in new tab (anchor click) |
 | `downloadJson()` | GET `/export/json` | Opens in new tab |
 | `downloadPdf()` | GET `/export/pdf` | Opens in new tab |
+| `submitReview(review)` | POST `/news/reviews` | Submit user story review (public) |
 
 All fetch functions have try/catch and return empty defaults on failure.
 
@@ -931,6 +958,19 @@ interface Briefing {
   content: string
   created_at: string
 }
+
+interface StoryReview {
+  story_title: string
+  story_url?: string
+  correct_section: "yes" | "no"
+  suggested_section?: string
+  summary_concise: "yes" | "no"
+  picture_available: "yes" | "no"
+  comment?: string
+}
+
+const SECTORS = ["Markets", "Tech", "Geopolitics", "Energy", "India", "Sports", "General"] as const
+type Sector = (typeof SECTORS)[number]
 ```
 
 ### 5.10 shadcn/ui Components
@@ -1047,6 +1087,17 @@ sector_summaries
 ├── sector (str, indexed)
 ├── summary (str)
 ├── headline_count (int)
+└── created_at (str, ISO)
+
+story_reviews
+├── id (PK, str, UUID)
+├── story_title (str)
+├── story_url (str, nullable)
+├── correct_section (str, "yes" or "no")
+├── suggested_section (str, nullable)
+├── summary_concise (str, "yes" or "no")
+├── picture_available (str, "yes" or "no")
+├── comment (text, nullable)
 └── created_at (str, ISO)
 ```
 
@@ -1197,6 +1248,47 @@ On rate limit:
 { "detail": "Rate limit exceeded. Try again in X seconds.", "retry_after": X }
 ```
 
+### POST /news/reviews
+
+Submit a user story review. Public endpoint — does NOT require `X-API-Key` even if `API_KEY` is configured.
+
+**Request body:**
+```json
+{
+  "story_title": "Fed Rate Decision...",
+  "story_url": "https://...",
+  "correct_section": "no",
+  "suggested_section": "Markets",
+  "summary_concise": "yes",
+  "picture_available": "no",
+  "comment": "The image link is broken"
+}
+```
+
+**Response:**
+```json
+{ "message": "Review submitted", "review": { ... }, "id": "uuid-string" }
+```
+
+### GET /news/reviews
+
+Returns all submitted story reviews (for analysis and fine-tuning).
+
+**Response:**
+```json
+{
+  "reviews": [
+    {
+      "id": "uuid",
+      "story_title": "Fed Rate Decision...",
+      "correct_section": "no",
+      "suggested_section": "Markets",
+      "created_at": "2025-04-10T10:00:00"
+    }
+  ]
+}
+```
+
 ---
 
 ## 9. Deployment Configuration
@@ -1319,7 +1411,7 @@ Key details:
 ## 12. Development Status & Roadmap
 
 ### Current Status ✅
-- ✅ Backend: Complete — 8 service modules, 2 database models, full API
+- ✅ Backend: Complete — 8 service modules, 7 database models (Article, Cluster, Summary, MarketData, Briefing, SectorSummary, StoryReview), full API
 - ✅ Frontend: Complete — Dashboard + sector pages + market dashboard
 - ✅ Core tests: 35 passing (18 unit + 17 integration) — smoke tests: 9 (RSS-dependent)
 - ✅ Docker: Multi-stage build, optimized for Render free tier
