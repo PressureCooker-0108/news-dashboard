@@ -59,6 +59,12 @@ export function SectorHeatmap({ sectorGroups, activeSectors }: SectorHeatmapProp
     return Math.max(0.04, Math.min(0.25, score / 100))
   }
 
+  // Secondary heatmap grid — a denser overlay for more granular intensity
+  function heatmapOverlay(score: number, rgb: string): string {
+    const opacity = Math.max(0.06, Math.min(0.35, (score / 100) * 0.35))
+    return `repeating-linear-gradient(45deg, rgba(${rgb}, ${opacity}) 0px, rgba(${rgb}, ${opacity}) 1px, transparent 1px, transparent 6px)`
+  }
+
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-2">
@@ -92,9 +98,17 @@ export function SectorHeatmap({ sectorGroups, activeSectors }: SectorHeatmapProp
                   style={{ backgroundColor: `rgba(${rgb}, ${opacity})` }}
                 />
 
+                {/* Heatmap grid overlay — denser diagonal lines at higher intensity */}
+                {normalizedScore > 20 && (
+                  <div
+                    className="absolute inset-0 transition-opacity duration-700"
+                    style={{ backgroundImage: heatmapOverlay(normalizedScore, rgb) }}
+                  />
+                )}
+
                 {/* Score intensity bar at bottom */}
                 <div
-                  className="absolute bottom-0 left-0 h-[3px] transition-all duration-700 ease-out"
+                  className="absolute bottom-0 left-0 h-[3px] transition-all duration-700 ease-out group-hover:h-[4px]"
                   style={{
                     width: `${Math.min(normalizedScore, 100)}%`,
                     backgroundColor: `rgba(${rgb}, 0.8)`,

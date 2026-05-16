@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef, useCallback } from "react"
 import { Story } from "@/types/story"
 import { fetchStories, fetchTrending } from "@/lib/api"
 import { Header } from "@/components/header"
@@ -42,6 +42,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
+  const [debouncedQuery, setDebouncedQuery] = useState("")
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [trendingData, setTrendingData] = useState<{ title: string; score: number }[]>([])
   const [now, setNow] = useState(Date.now())
   const [lastFetchedAt, setLastFetchedAt] = useState(Date.now())
@@ -76,8 +78,21 @@ export default function Dashboard() {
     return () => clearInterval(interval)
   }, [])
 
+  // Debounce search query — 300ms
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => setDebouncedQuery(value), 300)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [])
+
   // Search filter
-  const query = searchQuery.toLowerCase()
+  const query = debouncedQuery.toLowerCase()
   const filteredStories = query
     ? stories.filter(
         (s) =>
@@ -117,10 +132,24 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col items-center justify-center py-32 gap-4">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-            <p className="text-sm text-muted-foreground animate-pulse">Syncing Intel...</p>
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+          {/* Hero skeleton */}
+          <div className="animate-pulse">
+            <div className="rounded-xl bg-muted h-64 sm:h-80 lg:h-96 w-full" />
+          </div>
+          {/* Story card skeletons — grid of 6 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="animate-pulse rounded-xl border border-border/50 p-4 space-y-3">
+                <div className="bg-muted h-5 w-3/4 rounded" />
+                <div className="bg-muted/60 h-3 w-full rounded" />
+                <div className="bg-muted/60 h-3 w-5/6 rounded" />
+                <div className="flex gap-2 pt-2">
+                  <div className="bg-muted/40 h-5 w-16 rounded-full" />
+                  <div className="bg-muted/40 h-5 w-12 rounded-full" />
+                </div>
+              </div>
+            ))}
           </div>
         </main>
       </div>
@@ -168,7 +197,7 @@ export default function Dashboard() {
                 <Input
                   placeholder="Search stories, sectors, topics..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   className="pl-9 h-10 text-sm w-full"
                 />
               </div>
@@ -292,15 +321,15 @@ export default function Dashboard() {
 
             {/* Export Buttons */}
             <div className="flex flex-wrap gap-2 sm:gap-3 justify-center pt-4 border-t border-border/50">
-              <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={() => { downloadMarkdown().catch(() => toast.error("Failed to download Markdown brief")); }}>
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={async () => { try { await downloadMarkdown(); toast.success("Markdown brief downloaded", { duration: 2500 }); } catch { toast.error("Failed to download Markdown brief"); } }}>
                 <FileText className="h-4 w-4 mr-1.5 sm:mr-2" />
                 <span className="hidden sm:inline">Export </span>Markdown
               </Button>
-              <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={() => { downloadJson().catch(() => toast.error("Failed to download JSON export")); }}>
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={async () => { try { await downloadJson(); toast.success("JSON export downloaded", { duration: 2500 }); } catch { toast.error("Failed to download JSON export"); } }}>
                 <Download className="h-4 w-4 mr-1.5 sm:mr-2" />
                 <span className="hidden sm:inline">Export </span>JSON
               </Button>
-              <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={() => { downloadPdf().catch(() => toast.error("Failed to download PDF briefing")); }}>
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={async () => { try { await downloadPdf(); toast.success("PDF briefing downloaded", { duration: 2500 }); } catch { toast.error("Failed to download PDF briefing"); } }}>
                 <FileDown className="h-4 w-4 mr-1.5 sm:mr-2" />
                 <span className="hidden sm:inline">Export </span>PDF
               </Button>

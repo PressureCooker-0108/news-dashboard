@@ -183,8 +183,18 @@ export function MarketDashboard() {
             Markets
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground text-center py-4">{error}</p>
+        <CardContent className="flex flex-col items-center gap-3 py-6">
+          <div className="rounded-full bg-muted p-3">
+            <BarChart3 className="h-6 w-6 text-muted-foreground" />
+          </div>
+          <p className="text-sm text-muted-foreground text-center">{error}</p>
+          <p className="text-[11px] text-muted-foreground/50 text-center max-w-xs">
+            Market data will auto-retry. Check back shortly or refresh manually.
+          </p>
+          <Button variant="outline" size="sm" onClick={load} className="mt-1">
+            <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+            Retry
+          </Button>
         </CardContent>
       </Card>
     )
