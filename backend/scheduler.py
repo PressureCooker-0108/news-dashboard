@@ -116,9 +116,10 @@ def run_pipeline() -> None:
             logger.info(f"Ranked {len(ranked)} stories")
 
             # 7. Classify each cluster (source sectors + TF-IDF refinement)
-            for story in ranked:
+            for i, story in enumerate(ranked):
                 cluster = story["cluster"]
                 text, source_sectors = _build_cluster_text(cluster)
+                logger.info(f"[PIPELINE] Story {i}: {len(cluster)} articles, source_sectors={source_sectors}, first_title={cluster[0].get('title','?')[:40]}")
                 sectors = classify_sectors(text, source_sectors=source_sectors)
                 story["sectors"] = sectors
 

@@ -451,7 +451,7 @@ def classify_sectors(combined_text: str, source_sectors: list[str] | None = None
     scores = _compute_sector_scores(combined_text)
 
     # Log inputs for debugging
-    logger.debug(f"[CLASSIFY] source_sectors={source_sectors}, text={combined_text[:100]}")
+    logger.info(f"[CLASSIFY] source_sectors={source_sectors}, text={combined_text[:80]}")
     logger.debug(f"[CLASSIFY] scores={dict(sorted(scores.items(), key=lambda x: -x[1])[:5])}")
 
     # If source sectors exist, always include them (they come from the
@@ -461,12 +461,12 @@ def classify_sectors(combined_text: str, source_sectors: list[str] | None = None
         best = _get_best_sectors(scores, threshold=0.3)
         combined = list(dict.fromkeys(source_sectors + [s for s in best if s not in source_sectors]))
         result = combined[:3]
-        logger.debug(f"[CLASSIFY] result={result} (source + keyword)")
+        logger.info(f"[CLASSIFY] result={result} (source + keyword)")
         _classification_cache[cache_key] = result
         return result
 
     best = _get_best_sectors(scores, threshold=0.3)
-    logger.debug(f"[CLASSIFY] result={best} (keyword only)")
+    logger.info(f"[CLASSIFY] result={best} (keyword only, source_sectors was empty)")
     _classification_cache[cache_key] = best
     return best
 
