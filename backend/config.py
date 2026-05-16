@@ -46,7 +46,7 @@ RSS_SOURCES = [
     {"name": "LiveMint", "url": "https://www.livemint.com/rss/news", "sectors": ["Markets", "India"]},
     {"name": "Economic Times", "url": "https://economictimes.indiatimes.com/rssfeedstopstories.cms", "sectors": ["Markets", "India"]},
     {"name": "Business Standard", "url": "https://www.business-standard.com/rss/home_page_top_stories.rss", "sectors": ["Markets", "India"]},
-    {"name": "Moneycontrol", "url": "https://www.moneycontrol.com/rss/latestnews.xml", "sectors": ["Markets"]},
+    {"name": "Moneycontrol", "url": "https://www.moneycontrol.com/rss/latestnews.xml", "sectors": ["Markets", "India"]},
 
     # ── Tech ──
     {"name": "BBC Technology", "url": "https://feeds.bbci.co.uk/news/technology/rss.xml", "sectors": ["Tech"]},
