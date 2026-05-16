@@ -122,6 +122,10 @@ def save_articles(articles_data: list[dict], db: Session | None = None) -> int:
                 )
                 db.add(new_article)
                 inserted += 1
+            else:
+                # Article already exists — update fetched_at so the next
+                # pipeline run's get_recent_articles(hours=24) can find it.
+                exists.fetched_at = now
         if own_session:
             db.commit()
     except Exception as e:

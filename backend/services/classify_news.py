@@ -450,26 +450,25 @@ def classify_sectors(combined_text: str, source_sectors: list[str] | None = None
     # Compute keyword match scores
     scores = _compute_sector_scores(combined_text)
 
+    # Log inputs for debugging
+    logger.debug(f"[CLASSIFY] source_sectors={source_sectors}, text={combined_text[:100]}")
+    logger.debug(f"[CLASSIFY] scores={dict(sorted(scores.items(), key=lambda x: -x[1])[:5])}")
+
     # If source sectors exist, always include them (they come from the
     # trusted RSS_SOURCES config, not the polluted DB). Use keyword matching
     # only to ADD additional sectors that the source tag might have missed.
     if source_sectors and len(source_sectors) > 0:
         best = _get_best_sectors(scores, threshold=0.3)
-        # Combine source sectors with keyword-best sectors, deduped
         combined = list(dict.fromkeys(source_sectors + [s for s in best if s not in source_sectors]))
         result = combined[:3]
+        logger.debug(f"[CLASSIFY] result={result} (source + keyword)")
         _classification_cache[cache_key] = result
         return result
 
-        # All source sectors failed validation (e.g. Mexican cartel from
-        # Times of India → "India" has zero keyword matches) — fall through
-        # to keyword-based classification.
-        # This is the KEY behavior: source tags can be overridden.
-
-    # Fallback: keyword-based classification
-    result = _get_best_sectors(scores, threshold=0.3)
-    _classification_cache[cache_key] = result
-    return result
+    best = _get_best_sectors(scores, threshold=0.3)
+    logger.debug(f"[CLASSIFY] result={best} (keyword only)")
+    _classification_cache[cache_key] = best
+    return best
 
 
 # Keep backward compatibility — single-sector wrapper
