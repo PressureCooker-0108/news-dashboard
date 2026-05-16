@@ -9,6 +9,7 @@ export interface Story {
   source?: string[]
   sector_summary?: string
   trending_score?: number
+  image_url?: string
 }
 
 export interface MarketDataPoint {

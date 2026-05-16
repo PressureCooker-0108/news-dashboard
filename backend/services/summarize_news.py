@@ -275,13 +275,29 @@ def _why_it_matters(cluster: list[dict]) -> str:
         return TOPIC_TEMPLATES["default"]
 
 def summarize_stories(ranked_stories: list[dict]) -> list[dict]:
-    """Enrich stories with headlines/summaries."""
+    """Enrich stories with headlines/summaries and pass through images."""
     results: list[dict] = []
     for story in ranked_stories:
         cluster = story["cluster"]
         title, url = _pick_headline(cluster)
         summary = _make_summary(cluster)
         why = _why_it_matters(cluster)
+
+        # Pick the best image from the cluster: prefer the article whose headline
+        # was chosen, otherwise the first article with an image_url
+        image_url = None
+        if cluster:
+            # First try to find the article that matches our chosen URL
+            for a in cluster:
+                if a.get("url") == url and a.get("image_url"):
+                    image_url = a["image_url"]
+                    break
+            # Fallback: first image found in cluster
+            if not image_url:
+                for a in cluster:
+                    if a.get("image_url"):
+                        image_url = a["image_url"]
+                        break
 
         results.append({
             "title": title,
@@ -293,7 +309,8 @@ def summarize_stories(ranked_stories: list[dict]) -> list[dict]:
             "source": story["sources"],
             "published_at": story["latest_at"],
             "latest_at": story["latest_at"],
-            "sectors": story.get("sectors", ["General"])
+            "sectors": story.get("sectors", ["General"]),
+            "image_url": image_url,
         })
     return results
 

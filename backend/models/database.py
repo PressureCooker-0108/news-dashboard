@@ -83,7 +83,8 @@ def save_articles(articles_data: list[dict], db: Session | None = None) -> int:
                     published_at=a["published_at"],
                     content_snippet=a.get("content_snippet", ""),
                     fetched_at=now,
-                    sectors=json.dumps(a.get("source_sectors", []))
+                    sectors=json.dumps(a.get("source_sectors", [])),
+                    image_url=a.get("image_url")
                 )
                 db.add(new_article)
                 inserted += 1
@@ -116,6 +117,7 @@ def get_recent_articles(hours: int = 24) -> list[dict]:
                 "fetched_at": a.fetched_at,
                 "cluster_id": a.cluster_id,
                 "source_sectors": json.loads(a.sectors) if a.sectors else [],
+                "image_url": a.image_url,
             }
             for a in articles
         ]
@@ -159,6 +161,7 @@ def save_stories(stories_data: list[dict], db: Session | None = None) -> None:
                 sectors=sectors_str,
                 sector_summary=s.get("sector_summary"),
                 trending_score=s.get("trending_score"),
+                image_url=s.get("image_url"),
             )
             db.add(new_story)
         if own_session:
@@ -198,6 +201,7 @@ def get_top_stories(limit: int = 10) -> list[dict]:
                 "sectors": sectors,
                 "sector_summary": s.sector_summary,
                 "trending_score": s.trending_score,
+                "image_url": s.image_url,
             })
         return results
     finally:
@@ -245,6 +249,7 @@ def get_stories_by_sector(sector: str, limit: int = 20) -> list[dict]:
                 "sectors": sectors,
                 "sector_summary": s.sector_summary,
                 "trending_score": s.trending_score,
+                "image_url": s.image_url,
             })
         return results
     finally:

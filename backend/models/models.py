@@ -18,6 +18,7 @@ class Article(Base):
     sectors = Column(Text, nullable=True)  # JSON-serialized list of source-assigned sectors
     cluster_id = Column(String, nullable=True)
     embedding = Column(Text, nullable=True)  # JSON-serialized list of floats
+    image_url = Column(String, nullable=True)  # Extracted from RSS media/thumbnail tags
 
 
 class Cluster(Base):
@@ -44,6 +45,7 @@ class Summary(Base):
     sectors = Column(String)  # JSON-serialized list
     sector_summary = Column(Text, nullable=True)  # Per-sector summary
     trending_score = Column(Float, nullable=True)  # Historical trending
+    image_url = Column(String, nullable=True)  # Image from the cluster's best article
 
 
 class MarketData(Base):

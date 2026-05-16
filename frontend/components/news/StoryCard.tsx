@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { Story } from "@/types/story"
 import {
   Dialog,
@@ -7,7 +8,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { ExternalLink, Newspaper, TrendingUp, BarChart3, FileText } from "lucide-react"
+import { ExternalLink, Newspaper, TrendingUp, BarChart3, FileText, ImageOff } from "lucide-react"
 
 interface StoryCardProps {
   story: Story
@@ -15,12 +16,34 @@ interface StoryCardProps {
 }
 
 export function StoryCard({ story, className }: StoryCardProps) {
+  const [imgError, setImgError] = useState(false)
+  const hasImage = !!story.image_url && !imgError
+
   const CardContent = (
-    <article className={`h-full rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:shadow-lg hover:border-primary/30 hover:-translate-y-0.5 group cursor-pointer ${className}`}>
-      <div className="flex flex-col h-full justify-between space-y-4">
-        <div className="space-y-3">
+    <article className={`h-full rounded-xl border border-border bg-card overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-primary/30 hover:-translate-y-0.5 group cursor-pointer ${className}`}>
+      {/* Thumbnail image */}
+      {hasImage && (
+        <div className="relative h-40 sm:h-48 w-full overflow-hidden">
+          <img
+            src={story.image_url!}
+            alt=""
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+            onError={() => setImgError(true)}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-card via-card/10 to-transparent" />
+        </div>
+      )}
+      {!hasImage && (
+        <div className="h-24 w-full bg-gradient-to-br from-primary/5 via-secondary/10 to-background flex items-center justify-center">
+          <ImageOff className="h-6 w-6 text-muted-foreground/20" />
+        </div>
+      )}
+
+      <div className="p-5 sm:p-6">
+        <div className="flex flex-col space-y-3">
           {/* Headline */}
-          <h4 className="font-semibold leading-tight text-foreground text-lg group-hover:text-primary transition-colors">
+          <h4 className="font-semibold leading-tight text-foreground text-base sm:text-lg group-hover:text-primary transition-colors">
             {story.headline}
           </h4>
           
@@ -32,7 +55,7 @@ export function StoryCard({ story, className }: StoryCardProps) {
         
         {/* Why it matters */}
         {story.why_it_matters && (
-          <div className="pt-4 border-t border-border/50">
+          <div className="mt-4 pt-4 border-t border-border/50">
             <p className="text-xs leading-relaxed text-muted-foreground italic font-light line-clamp-2">
               <span className="font-medium not-italic text-foreground/80">Context:</span> {story.why_it_matters}
             </p>
@@ -48,6 +71,18 @@ export function StoryCard({ story, className }: StoryCardProps) {
         <div className="block h-full">{CardContent}</div>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
+        {/* Hero image in dialog */}
+        {hasImage && (
+          <div className="relative -mx-6 -mt-6 mb-4 h-48 sm:h-64 overflow-hidden rounded-t-xl">
+            <img
+              src={story.image_url!}
+              alt=""
+              className="h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+          </div>
+        )}
+
         <DialogHeader>
           <DialogTitle className="text-xl leading-tight">{story.headline}</DialogTitle>
         </DialogHeader>
