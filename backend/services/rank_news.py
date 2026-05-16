@@ -111,7 +111,7 @@ def _recency_score(latest: datetime) -> float:
         return 0.0
     # Exponential decay: score = e^(-0.1 * (age-2))
     # This gives: ~82% at 4h, ~67% at 6h, ~37% at 12h, ~14% at 24h
-    return max(0.0, np.exp(-0.1 * (age_hours - 2)))
+    return float(max(0.0, np.exp(-0.1 * (age_hours - 2))))
 
 
 
@@ -160,7 +160,7 @@ def rank_clusters(clusters: list[list[dict]]) -> list[dict]:
 
         scored.append({
             "cluster": cluster,
-            "score": round(final, 4),
+            "score": float(round(final, 4)),
             "article_count": size,
             "latest_at": latest.isoformat(),
             "sources": sources,
