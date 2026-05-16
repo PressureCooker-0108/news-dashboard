@@ -16,6 +16,7 @@ const SECTOR_RGB: Record<string, string> = {
   Geopolitics: "239, 68, 68",    // red-500
   Energy:      "245, 158, 11",   // amber-500
   India:       "249, 115, 22",   // orange-500
+  Sports:      "168, 85, 247",   // purple-500
   General:     "100, 116, 139",  // slate-500
 }
 
@@ -25,6 +26,7 @@ const SECTOR_ICONS: Record<string, string> = {
   Geopolitics: "🌍",
   Energy: "⚡",
   India: "🇮🇳",
+  Sports: "🏆",
   General: "📰",
 }
 

@@ -17,6 +17,7 @@ const SECTOR_COLORS: Record<string, { bg: string; text: string; accent: string }
   Geopolitics: { bg: "from-red-500/20 to-red-600/10", text: "text-red-400", accent: "border-red-500/30" },
   Energy: { bg: "from-amber-500/20 to-amber-600/10", text: "text-amber-400", accent: "border-amber-500/30" },
   India: { bg: "from-orange-500/20 to-orange-600/10", text: "text-orange-400", accent: "border-orange-500/30" },
+  Sports: { bg: "from-purple-500/20 to-purple-600/10", text: "text-purple-400", accent: "border-purple-500/30" },
   General: { bg: "from-slate-500/20 to-slate-600/10", text: "text-slate-400", accent: "border-slate-500/30" },
 }
 
@@ -26,6 +27,7 @@ const SECTOR_ICONS: Record<string, string> = {
   Geopolitics: "🌍",
   Energy: "⚡",
   India: "🇮🇳",
+  Sports: "🏆",
   General: "📰",
 }
 

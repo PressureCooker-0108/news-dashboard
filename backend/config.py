@@ -99,6 +99,18 @@ RSS_SOURCES = [
 
     # ── General / Fallback ──
     {"name": "The Guardian Tech", "url": "https://www.theguardian.com/uk/technology/rss", "sectors": ["Tech"]},
+
+    # ── Sports ──
+    {"name": "BBC Sport", "url": "https://feeds.bbci.co.uk/sport/rss.xml", "sectors": ["Sports"]},
+    {"name": "ESPN", "url": "https://www.espn.com/espn/rss/news", "sectors": ["Sports"]},
+    {"name": "Sky Sports", "url": "https://www.skysports.com/rss/12040", "sectors": ["Sports"]},
+    {"name": "The Guardian Sport", "url": "https://www.theguardian.com/uk/sport/rss", "sectors": ["Sports"]},
+    {"name": "CBS Sports", "url": "https://www.cbssports.com/rss/headlines", "sectors": ["Sports"]},
+    {"name": "Yahoo Sports", "url": "https://sports.yahoo.com/rss/", "sectors": ["Sports"]},
+    {"name": "Sports Illustrated", "url": "https://www.si.com/rss/top", "sectors": ["Sports"]},
+    {"name": "Reuters Sports", "url": "https://www.reutersagency.com/feed/?best-topics=sports", "sectors": ["Sports"]},
+    {"name": "NYT Sports", "url": "https://rss.nytimes.com/services/xml/rss/nyt/Sports.xml", "sectors": ["Sports"]},
+    {"name": "Fox Sports", "url": "https://api.foxsports.com/v1/rss?partnerKey=zBaFxRyGKCfxBagJG9b8pqLyndmvo7UU", "sectors": ["Sports"]},
 ]
 
 # ──────────────────────────────────────────────

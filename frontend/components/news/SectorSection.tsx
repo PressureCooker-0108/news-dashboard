@@ -10,6 +10,7 @@ const SECTOR_ICONS: Record<string, string> = {
   Geopolitics: "🌍",
   Energy: "⚡",
   India: "🇮🇳",
+  Sports: "🏆",
   General: "📰",
 }
 
@@ -25,7 +26,7 @@ export function SectorSection({ stories }: { stories: Story[] }) {
     }
   }
 
-  const displayOrder = ["Markets", "Tech", "Geopolitics", "Energy", "India", "General"]
+  const displayOrder = ["Markets", "Tech", "Geopolitics", "Energy", "India", "Sports", "General"]
   const activeSectors = displayOrder.filter((s) => seenSectors.has(s))
 
   if (activeSectors.length === 0) return null

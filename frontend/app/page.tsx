@@ -34,6 +34,7 @@ const SCOLORS: Record<string, string> = {
   Geopolitics: "red",
   Energy: "amber",
   India: "orange",
+  Sports: "purple",
   General: "slate",
 }
 
@@ -114,7 +115,7 @@ export default function Dashboard() {
     }
   }
 
-  const displayOrder = ["Markets", "Tech", "Geopolitics", "Energy", "India", "General"]
+  const displayOrder = ["Markets", "Tech", "Geopolitics", "Energy", "India", "Sports", "General"]
   const activeSectors = displayOrder.filter((s) => seenSectors.has(s))
 
   // Calculate relative time for last update
