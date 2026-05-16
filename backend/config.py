@@ -43,7 +43,7 @@ RSS_SOURCES = [
     {"name": "Investing.com", "url": "https://www.investing.com/rss/news.rss", "sectors": ["Markets"]},
     {"name": "NPR Business", "url": "https://feeds.npr.org/1014/rss.xml", "sectors": ["Markets"]},
     {"name": "The Guardian Business", "url": "https://www.theguardian.com/business/rss", "sectors": ["Markets"]},
-    {"name": "LiveMint", "url": "https://www.livemint.com/rss/news", "sectors": ["Markets"]},
+    {"name": "LiveMint", "url": "https://www.livemint.com/rss/news", "sectors": ["Markets", "India"]},
     {"name": "Economic Times", "url": "https://economictimes.indiatimes.com/rssfeedstopstories.cms", "sectors": ["Markets", "India"]},
     {"name": "Business Standard", "url": "https://www.business-standard.com/rss/home_page_top_stories.rss", "sectors": ["Markets", "India"]},
     {"name": "Moneycontrol", "url": "https://www.moneycontrol.com/rss/latestnews.xml", "sectors": ["Markets"]},
@@ -70,7 +70,7 @@ RSS_SOURCES = [
     {"name": "Energy Voice", "url": "https://www.energyvoice.com/feed/", "sectors": ["Energy"]},
 
     # ── General / Fallback (use TF-IDF) ──
-    {"name": "The Guardian Tech", "url": "https://www.theguardian.com/uk/technology/rss", "sectors": []},
+    {"name": "The Guardian Tech", "url": "https://www.theguardian.com/uk/technology/rss", "sectors": ["Tech"]},
 ]
 
 # ──────────────────────────────────────────────

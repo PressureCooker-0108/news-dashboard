@@ -42,8 +42,9 @@ def _build_cluster_text(cluster: list[dict]) -> tuple[str, list[str]]:
         for sec in a.get("source_sectors", []):
             sector_counts[sec] = sector_counts.get(sec, 0) + 1
 
-    # Return sectors that appear in at least 2 articles in the cluster
-    source_sectors = [s for s, c in sector_counts.items() if c >= 2] if sector_counts else []
+    # Return all source sectors from the cluster — source tags are high-confidence
+    # (they come from RSS feed config, not ML). Even 1 article's tag is reliable.
+    source_sectors = list(sector_counts.keys()) if sector_counts else []
 
     return " ".join(parts), source_sectors
 
