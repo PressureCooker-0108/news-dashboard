@@ -1,7 +1,7 @@
 import os
 import json
 from datetime import datetime, timedelta, timezone
-from sqlalchemy import create_engine, desc
+from sqlalchemy import create_engine, desc, inspect, text
 from sqlalchemy.orm import Session, sessionmaker
 
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -49,7 +49,41 @@ def get_db():
 
 def init_db():
     from .models import Article, Cluster, Summary, MarketData, Briefing, SectorSummary
+    from loguru import logger
+    
+    # Create tables that don't exist yet
     Base.metadata.create_all(bind=engine)
+    
+    # Auto-migrate: add missing columns to existing tables
+    # create_all only CREATES new tables, it doesn't add columns to existing ones.
+    # This handles the case where new columns were added to models after the
+    # production database was already created (e.g., image_url, sectors).
+    inspector = inspect(engine)
+    for table_name, model_class in [
+        ("articles", Article),
+        ("stories", Summary),
+        ("market_data", MarketData),
+        ("briefings", Briefing),
+        ("sector_summaries", SectorSummary),
+    ]:
+        try:
+            existing_cols = {c["name"] for c in inspector.get_columns(table_name)}
+        except Exception:
+            continue  # Table might not exist yet
+        model_cols = {c.name for c in model_class.__table__.columns if c.nullable is not False}
+        missing = model_cols - existing_cols
+        for col_name in missing:
+            col = next(c for c in model_class.__table__.columns if c.name == col_name)
+            col_type_str = col.type.compile(engine.dialect)
+            try:
+                with engine.connect() as conn:
+                    conn.execute(
+                        text(f'ALTER TABLE "{table_name}" ADD COLUMN "{col_name}" {col_type_str}')
+                    )
+                    conn.commit()
+                logger.info(f"Added missing column '{col_name}' to '{table_name}'")
+            except Exception as e:
+                logger.warning(f"Could not add column '{col_name}' to '{table_name}': {e}")
 
 
 # ──────────────────────────────────────────────
