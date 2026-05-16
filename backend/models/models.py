@@ -15,6 +15,7 @@ class Article(Base):
     published_at = Column(String)
     content_snippet = Column(String)
     fetched_at = Column(String)
+    sectors = Column(Text, nullable=True)  # JSON-serialized list of source-assigned sectors
     cluster_id = Column(String, nullable=True)
     embedding = Column(Text, nullable=True)  # JSON-serialized list of floats
 

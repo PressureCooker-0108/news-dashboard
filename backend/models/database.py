@@ -82,7 +82,8 @@ def save_articles(articles_data: list[dict], db: Session | None = None) -> int:
                     source=a["source"],
                     published_at=a["published_at"],
                     content_snippet=a.get("content_snippet", ""),
-                    fetched_at=now
+                    fetched_at=now,
+                    sectors=json.dumps(a.get("source_sectors", []))
                 )
                 db.add(new_article)
                 inserted += 1
@@ -113,7 +114,8 @@ def get_recent_articles(hours: int = 24) -> list[dict]:
                 "published_at": a.published_at,
                 "content_snippet": a.content_snippet,
                 "fetched_at": a.fetched_at,
-                "cluster_id": a.cluster_id
+                "cluster_id": a.cluster_id,
+                "source_sectors": json.loads(a.sectors) if a.sectors else [],
             }
             for a in articles
         ]

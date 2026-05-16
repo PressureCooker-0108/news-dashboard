@@ -148,30 +148,52 @@ def _classify_with_tfidf(combined_text: str) -> list[str]:
 
 # ── Public API ───────────────────────────────
 
-def classify_sectors(combined_text: str) -> list[str]:
+def classify_sectors(combined_text: str, source_sectors: list[str] | None = None) -> list[str]:
     """
-    Classify news text into 1-2 sectors using TF-IDF keyword matching
-    against rich semantic sector descriptions.
+    Classify news text into 1-2 sectors.
+
+    Uses a two-tier approach:
+      1. **Source-assigned sectors** (from RSS feed config) — high-confidence
+         primary tags that are always kept.
+      2. **TF-IDF refinement** — detects additional sector signals from the
+         article text. A secondary sector is added only if TF-IDF finds strong
+         evidence (>65% confidence threshold).
 
     Args:
         combined_text: title + description/snippet combined text
+        source_sectors: sectors pre-assigned from the article's RSS source
 
     Returns:
-        List of 1-2 sector strings (e.g. ["Tech", "Markets"])
+        List of 1-3 sector strings (e.g. ["Markets", "Tech"])
     """
     # Check cache
-    cache_key = combined_text[:200]
+    suffix = f"|{','.join(source_sectors)}" if source_sectors else ""
+    cache_key = f"{combined_text[:200]}{suffix}"
     if cache_key in _classification_cache:
         return _classification_cache[cache_key]
 
-    sectors = _classify_with_tfidf(combined_text)
+    # Tier 1: source-assigned sectors (preserve these as primary tags)
+    base_sectors = list(source_sectors) if source_sectors else []
 
-    # Filter out "General" unless it's the only sector
-    if len(sectors) > 1 and "General" in sectors:
-        sectors = [s for s in sectors if s != "General"]
+    # Tier 2: TF-IDF refinement for additional sector signals
+    tfidf_sectors = _classify_with_tfidf(combined_text)
 
-    _classification_cache[cache_key] = sectors
-    return sectors
+    # Filter out "General" from TF-IDF results if we already have specific sectors
+    if len(base_sectors) > 0 and "General" in tfidf_sectors:
+        tfidf_sectors = [s for s in tfidf_sectors if s != "General"]
+
+    # Merge: keep all base sectors, add TF-IDF sectors that aren't already present
+    merged = list(base_sectors)
+    for s in tfidf_sectors:
+        if s not in merged:
+            merged.append(s)
+
+    # If nothing was assigned, default to General
+    if not merged:
+        merged = ["General"]
+
+    _classification_cache[cache_key] = merged
+    return merged
 
 
 # Keep backward compatibility — single-sector wrapper

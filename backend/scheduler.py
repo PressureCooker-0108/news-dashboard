@@ -22,14 +22,30 @@ from models.database import (
 _scheduler = BackgroundScheduler()
 
 
-def _build_cluster_text(cluster: list[dict]) -> str:
-    """Build a combined text snippet from a cluster for classification."""
+def _build_cluster_text(cluster: list[dict]) -> tuple[str, list[str]]:
+    """Build a combined text snippet from a cluster for classification.
+
+    Also collects all source-assigned sector tags from the articles in the
+    cluster. The most common source sectors are returned alongside the text
+    so the classifier can use them as high-confidence primary tags.
+
+    Returns:
+        (combined_text, source_sectors)  — e.g. ("text...", ["India", "Tech"])
+    """
     parts = []
+    sector_counts: dict[str, int] = {}
     for a in cluster[:5]:
         title = a.get("title", "")
         snippet = a.get("content_snippet", "")[:150]
         parts.append(f"{title}. {snippet}" if snippet else title)
-    return " ".join(parts)
+        # Collect source-assigned sectors from each article
+        for sec in a.get("source_sectors", []):
+            sector_counts[sec] = sector_counts.get(sec, 0) + 1
+
+    # Return sectors that appear in at least 2 articles in the cluster
+    source_sectors = [s for s, c in sector_counts.items() if c >= 2] if sector_counts else []
+
+    return " ".join(parts), source_sectors
 
 
 def run_pipeline() -> None:
@@ -71,7 +87,9 @@ def run_pipeline() -> None:
             logger.info(f"Got {len(recent)} recent articles for clustering")
 
             # Limit articles to prevent OOM on Render's free tier (512 MB RAM)
-            MAX_ARTICLES = 250
+            # Now that classification uses source-assigned sectors, we can increase
+            # the limit — more articles means better sector coverage per source.
+            MAX_ARTICLES = 500
             if len(recent) > MAX_ARTICLES:
                 logger.info(f"Limiting to {MAX_ARTICLES} articles for clustering (had {len(recent)})")
                 recent = recent[:MAX_ARTICLES]
@@ -94,11 +112,11 @@ def run_pipeline() -> None:
             ranked = rank_clusters(clusters)
             logger.info(f"Ranked {len(ranked)} stories")
 
-            # 7. Classify each cluster
+            # 7. Classify each cluster (source sectors + TF-IDF refinement)
             for story in ranked:
                 cluster = story["cluster"]
-                text = _build_cluster_text(cluster)
-                sectors = classify_sectors(text)
+                text, source_sectors = _build_cluster_text(cluster)
+                sectors = classify_sectors(text, source_sectors=source_sectors)
                 story["sectors"] = sectors
 
             # 8. Summarize
