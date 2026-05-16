@@ -20,10 +20,13 @@ RSS_SOURCES = [
     # ── Geopolitics / World News ──
     {"name": "BBC World", "url": "https://feeds.bbci.co.uk/news/world/rss.xml", "sectors": ["Geopolitics"]},
     {"name": "BBC General", "url": "https://feeds.bbci.co.uk/news/rss.xml", "sectors": ["Geopolitics", "General"]},
+    {"name": "CNN World", "url": "http://rss.cnn.com/rss/cnn_world.rss", "sectors": ["Geopolitics"]},
     {"name": "Al Jazeera", "url": "https://www.aljazeera.com/xml/rss/all.xml", "sectors": ["Geopolitics"]},
+    {"name": "France24", "url": "https://www.france24.com/en/rss", "sectors": ["Geopolitics"]},
     {"name": "The Guardian World", "url": "https://www.theguardian.com/world/rss", "sectors": ["Geopolitics"]},
     {"name": "The Guardian UK", "url": "https://www.theguardian.com/uk/rss", "sectors": ["Geopolitics", "General"]},
     {"name": "Foreign Policy", "url": "https://foreignpolicy.com/feed/", "sectors": ["Geopolitics"]},
+    {"name": "The Diplomat", "url": "https://thediplomat.com/feed/", "sectors": ["Geopolitics"]},
     {"name": "DW (Germany)", "url": "https://www.dw.com/en/top-stories/s-9097/rss", "sectors": ["Geopolitics"]},
     {"name": "SCMP (China)", "url": "https://www.scmp.com/rss/91/feed", "sectors": ["Geopolitics"]},
     {"name": "Japan Times", "url": "https://www.japantimes.co.jp/feed/", "sectors": ["Geopolitics"]},
@@ -34,6 +37,8 @@ RSS_SOURCES = [
     {"name": "NYTimes Economy", "url": "https://rss.nytimes.com/services/xml/rss/nyt/Economy.xml", "sectors": ["Markets"]},
     {"name": "Washington Post National", "url": "https://feeds.washingtonpost.com/rss/national", "sectors": ["Geopolitics", "General"]},
     {"name": "NPR News", "url": "https://feeds.npr.org/1001/rss.xml", "sectors": ["Geopolitics", "General"]},
+    {"name": "CBS News World", "url": "https://www.cbsnews.com/latest/rss/world", "sectors": ["Geopolitics"]},
+    {"name": "Defense News", "url": "https://www.defensenews.com/arc/outboundfeeds/rss/", "sectors": ["Geopolitics"]},
 
     # ── Markets & Business ──
     {"name": "NYTimes Business", "url": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml", "sectors": ["Markets"]},
@@ -64,10 +69,15 @@ RSS_SOURCES = [
     {"name": "The Hindu", "url": "https://www.thehindu.com/news/international/?service=rss", "sectors": ["India"]},
     {"name": "NDTV", "url": "https://feeds.feedburner.com/ndtvnews-top-stories", "sectors": ["India"]},
     {"name": "Indian Express", "url": "https://indianexpress.com/section/india/feed/", "sectors": ["India"]},
+    {"name": "Zee News", "url": "https://zeenews.india.com/rss/india-national-news.xml", "sectors": ["India"]},
 
     # ── Energy ──
+    {"name": "CleanTechnica", "url": "https://cleantechnica.com/feed/", "sectors": ["Energy", "Tech"]},
     {"name": "OilPrice.com", "url": "https://oilprice.com/rss/main", "sectors": ["Energy"]},
     {"name": "Energy Voice", "url": "https://www.energyvoice.com/feed/", "sectors": ["Energy"]},
+    {"name": "Utility Dive", "url": "https://www.utilitydive.com/feeds/news/", "sectors": ["Energy"]},
+    {"name": "Hydrogen Fuel News", "url": "https://www.hydrogenfuelnews.com/feed/", "sectors": ["Energy"]},
+    {"name": "ET EnergyWorld", "url": "https://energy.economictimes.indiatimes.com/rss/topstories", "sectors": ["Energy", "India"]},
 
     # ── General / Fallback (use TF-IDF) ──
     {"name": "The Guardian Tech", "url": "https://www.theguardian.com/uk/technology/rss", "sectors": ["Tech"]},
