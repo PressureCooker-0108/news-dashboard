@@ -453,7 +453,11 @@ def classify_sectors(combined_text: str, source_sectors: list[str] | None = None
 
     # If source sectors exist, validate each against keyword matches
     if source_sectors and len(source_sectors) > 0:
-        validated = [s for s in source_sectors if scores.get(s, 0) > 0]
+        top_score = max(scores.values()) if scores else 0
+        validated = [
+            s for s in source_sectors
+            if top_score > 0 and scores.get(s, 0) >= 0.15 * top_score
+        ]
 
         if validated:
             # Source tags validated — combine with keyword-based results

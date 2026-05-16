@@ -135,7 +135,11 @@ def save_articles(articles_data: list[dict], db: Session | None = None) -> int:
 
 
 def get_recent_articles(hours: int = 24) -> list[dict]:
+    from config import RSS_SOURCES
     from .models import Article
+    # Build a name→sectors lookup from current config — this way old articles
+    # get the correct source sectors even if the DB has stale TF-IDF data.
+    source_map = {s["name"]: s.get("sectors", []) for s in RSS_SOURCES}
     db = SessionLocal()
     try:
         cutoff = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()
@@ -150,7 +154,7 @@ def get_recent_articles(hours: int = 24) -> list[dict]:
                 "content_snippet": a.content_snippet,
                 "fetched_at": a.fetched_at,
                 "cluster_id": a.cluster_id,
-                "source_sectors": json.loads(a.sectors) if a.sectors else [],
+                "source_sectors": source_map.get(a.source, []),
                 "image_url": a.image_url,
             }
             for a in articles
