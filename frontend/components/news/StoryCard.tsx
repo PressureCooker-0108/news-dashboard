@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { ExternalLink, Newspaper, TrendingUp, BarChart3, FileText, ImageOff } from "lucide-react"
+import { StoryReview } from "./StoryReview"
 
 interface StoryCardProps {
   story: Story
@@ -150,6 +151,12 @@ export function StoryCard({ story, className }: StoryCardProps) {
               View original source
             </a>
           )}
+
+          {/* Story Review */}
+          <StoryReview
+            storyTitle={story.headline}
+            storyUrl={story.url}
+          />
         </div>
       </DialogContent>
     </Dialog>

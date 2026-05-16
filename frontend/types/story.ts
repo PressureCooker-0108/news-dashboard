@@ -39,3 +39,16 @@ export interface Briefing {
   content: string
   created_at: string
 }
+
+export interface StoryReview {
+  story_title: string
+  story_url?: string
+  correct_section: "yes" | "no"
+  suggested_section?: string
+  summary_concise: "yes" | "no"
+  picture_available: "yes" | "no"
+  comment?: string
+}
+
+export const SECTORS = ["Markets", "Tech", "Geopolitics", "Energy", "India", "Sports", "General"] as const
+export type Sector = (typeof SECTORS)[number]

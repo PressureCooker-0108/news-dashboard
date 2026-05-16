@@ -117,6 +117,29 @@ export async function fetchTrending(hours: number = 48): Promise<{ title: string
   }
 }
 
+export async function submitReview(review: {
+  story_title: string
+  story_url?: string
+  correct_section: "yes" | "no"
+  suggested_section?: string
+  summary_concise: "yes" | "no"
+  picture_available: "yes" | "no"
+  comment?: string
+}): Promise<{ status: string } | null> {
+  try {
+    const res = await fetch(`${API_URL}/news/reviews`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(review),
+    })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return await res.json()
+  } catch (err) {
+    console.error("Failed to submit review:", err)
+    return null
+  }
+}
+
 async function downloadExport(endpoint: string, _ext: string): Promise<void> {
   // Hidden anchor with target=_blank creates a real HTTP request
   // that IDM can intercept, while avoiding popup blockers.

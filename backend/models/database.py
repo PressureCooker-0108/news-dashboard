@@ -48,7 +48,7 @@ def get_db():
 
 
 def init_db():
-    from .models import Article, Cluster, Summary, MarketData, Briefing, SectorSummary
+    from .models import Article, Cluster, Summary, MarketData, Briefing, SectorSummary, StoryReview
     from loguru import logger
     
     # Create tables that don't exist yet
@@ -492,6 +492,74 @@ def get_trending_topics(hours: int = 48) -> list[dict]:
                 "created_at": s.created_at,
             }
             for s in stories
+        ]
+    finally:
+        db.close()
+
+
+# ──────────────────────────────────────────────
+# Story Reviews
+# ──────────────────────────────────────────────
+
+def save_review(review_data: dict) -> dict:
+    """Save a user review of a story.
+
+    Returns the saved review dict.
+    """
+    from .models import StoryReview
+    from uuid import uuid4
+    db = SessionLocal()
+    now = datetime.now(timezone.utc).isoformat()
+    try:
+        review = StoryReview(
+            id=str(uuid4()),
+            story_title=review_data["story_title"],
+            story_url=review_data.get("story_url"),
+            correct_section=review_data["correct_section"],
+            suggested_section=review_data.get("suggested_section"),
+            summary_concise=review_data["summary_concise"],
+            picture_available=review_data["picture_available"],
+            comment=review_data.get("comment"),
+            created_at=now,
+        )
+        db.add(review)
+        db.commit()
+        return {
+            "id": review.id,
+            "story_title": review.story_title,
+            "correct_section": review.correct_section,
+            "suggested_section": review.suggested_section,
+            "summary_concise": review.summary_concise,
+            "picture_available": review.picture_available,
+            "comment": review.comment,
+            "created_at": review.created_at,
+        }
+    except Exception as e:
+        db.rollback()
+        raise e
+    finally:
+        db.close()
+
+
+def get_reviews(limit: int = 100) -> list[dict]:
+    """Get all story reviews ordered by most recent first."""
+    from .models import StoryReview
+    db = SessionLocal()
+    try:
+        reviews = db.query(StoryReview).order_by(desc(StoryReview.created_at)).limit(limit).all()
+        return [
+            {
+                "id": r.id,
+                "story_title": r.story_title,
+                "story_url": r.story_url,
+                "correct_section": r.correct_section,
+                "suggested_section": r.suggested_section,
+                "summary_concise": r.summary_concise,
+                "picture_available": r.picture_available,
+                "comment": r.comment,
+                "created_at": r.created_at,
+            }
+            for r in reviews
         ]
     finally:
         db.close()

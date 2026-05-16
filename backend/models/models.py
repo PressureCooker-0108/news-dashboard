@@ -78,3 +78,17 @@ class SectorSummary(Base):
     summary = Column(Text)
     headline_count = Column(Integer)
     created_at = Column(String)
+
+
+class StoryReview(Base):
+    __tablename__ = "story_reviews"
+
+    id = Column(String, primary_key=True, index=True)
+    story_title = Column(String, nullable=False)
+    story_url = Column(String, nullable=True)
+    correct_section = Column(String, nullable=False)
+    suggested_section = Column(String, nullable=True)
+    summary_concise = Column(String, nullable=False)
+    picture_available = Column(String, nullable=False)
+    comment = Column(Text, nullable=True)
+    created_at = Column(String, nullable=False)

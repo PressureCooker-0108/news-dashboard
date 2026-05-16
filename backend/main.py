@@ -197,10 +197,15 @@ async def security_headers_middleware(request: Request, call_next):
 _API_KEY = os.environ.get("API_KEY")
 
 
+_PUBLIC_POST_PATHS = {"/news/reviews"}
+
+
 @app.middleware("http")
 async def api_key_middleware(request: Request, call_next):
-    """Require X-API-Key header on POST endpoints when API_KEY is configured."""
-    if _API_KEY and request.method == "POST":
+    """Require X-API-Key header on POST endpoints when API_KEY is configured.
+    Public POST paths in _PUBLIC_POST_PATHS are exempt from auth.
+    """
+    if _API_KEY and request.method == "POST" and request.url.path not in _PUBLIC_POST_PATHS:
         client_key = request.headers.get("X-API-Key", "")
         if client_key != _API_KEY:
             return JSONResponse(
@@ -446,6 +451,60 @@ def source_diversity():
 def trending(hours: int = Query(48, ge=1, le=168)):
     """Get trending topics over the specified time period."""
     return {"trending": get_trending_topics(hours=hours)}
+
+
+# ── Story Reviews ──
+
+@app.post("/news/reviews")
+def submit_story_review(data: dict):
+    """Submit a user review for a story.
+
+    Public endpoint — no API key required. Collects feedback on:
+    - Section correctness
+    - Summary quality
+    - Image availability
+    """
+    required = ["story_title", "correct_section", "summary_concise", "picture_available"]
+    for field in required:
+        if field not in data:
+            raise HTTPException(status_code=400, detail=f"Missing required field: {field}")
+
+    valid_values = ["yes", "no"]
+    for field in ["correct_section", "summary_concise", "picture_available"]:
+        if data.get(field, "").lower() not in valid_values:
+            raise HTTPException(status_code=400, detail=f"{field} must be 'yes' or 'no'")
+
+    try:
+        from models.database import save_review
+        review = save_review({
+            "story_title": data["story_title"],
+            "story_url": data.get("story_url"),
+            "correct_section": data["correct_section"],
+            "suggested_section": data.get("suggested_section"),
+            "summary_concise": data["summary_concise"],
+            "picture_available": data["picture_available"],
+            "comment": data.get("comment"),
+        })
+        return {"status": "ok", "review": review}
+    except Exception as e:
+        logger.exception(f"Failed to save review: {e}")
+        raise HTTPException(status_code=500, detail="Failed to save review")
+
+
+@app.get("/news/reviews")
+def get_story_reviews(limit: int = Query(100, ge=1, le=1000)):
+    """Get all submitted story reviews, most recent first.
+
+    Note: POST endpoints are behind API key auth when API_KEY is set.
+    GET endpoints are public (consistent with the rest of the API).
+    """
+    try:
+        from models.database import get_reviews
+        reviews = get_reviews(limit=limit)
+        return {"reviews": reviews, "count": len(reviews)}
+    except Exception as e:
+        logger.exception(f"Failed to fetch reviews: {e}")
+        return {"reviews": [], "count": 0}
 
 
 # ── Pipeline Control ──
