@@ -15,7 +15,7 @@ from services.rank_news import rank_clusters
 from services.market_data import fetch_and_store_market_data
 from services.briefing import generate_briefing
 from models.database import (
-    save_articles, get_recent_articles, save_stories,
+    save_articles, save_stories,
     init_db, save_sector_summary, SessionLocal
 )
 
@@ -78,14 +78,16 @@ def run_pipeline() -> None:
             inserted = save_articles(articles, db=db)
             logger.info(f"Inserted {inserted} new articles")
 
-            # Commit articles before closing this session so get_recent_articles can see them
+            # Commit articles so they're persisted
             db.commit()
 
-            # 4. Get recent articles for clustering (separate session — read-only)
+            # 4. Use freshly fetched articles for clustering (they have correct source_sectors
+            # from the current config. Re-reading from DB via get_recent_articles can return
+            # empty source_sectors for articles whose source name doesn't match current config.)
             db.close()
-            recent = get_recent_articles(hours=24)
+            recent = articles
             db = SessionLocal()
-            logger.info(f"Got {len(recent)} recent articles for clustering")
+            logger.info(f"Processing {len(recent)} articles for clustering")
 
             # Limit articles to prevent OOM on Render's free tier (512 MB RAM)
             # Now that classification uses source-assigned sectors, we can increase
