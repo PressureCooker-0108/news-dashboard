@@ -1,4 +1,5 @@
 import os
+import subprocess
 import threading
 import json
 import time
@@ -216,6 +217,20 @@ def health():
     """Health check for Render. NEVER touches the database — must always return 200
     even if the DB is down, otherwise Render marks the deploy as failed and restarts."""
     return {"status": "seriously operational"}
+
+
+@app.get("/version")
+def version():
+    """Return the current git commit hash for deployment verification."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            capture_output=True, text=True, timeout=5
+        )
+        commit = result.stdout.strip()
+        return {"commit": commit, "deployed": True}
+    except Exception as e:
+        return {"commit": "unknown", "error": str(e), "deployed": True}
 
 
 # ── News Endpoints ──
