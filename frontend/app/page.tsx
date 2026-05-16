@@ -1,18 +1,16 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Story, MarketDataPoint, SourceDiversity } from "@/types/story"
-import { fetchStories, fetchMarketData, fetchSourceDiversity, fetchTrending } from "@/lib/api"
+import { Story } from "@/types/story"
+import { fetchStories, fetchTrending } from "@/lib/api"
 import { Header } from "@/components/header"
 import { BigStory } from "@/components/news/BigStory"
 import { TopStories } from "@/components/news/TopStories"
 import { SectorSection } from "@/components/news/SectorSection"
 import { SectorHeatmap } from "@/components/news/SectorHeatmap"
-import { MarketDashboard } from "@/components/markets/MarketDashboard"
-import { Badge } from "@/components/ui/badge"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
 import {
   Activity,
   Globe,
@@ -21,9 +19,9 @@ import {
   FileText,
   Download,
   FileDown,
-  BarChart3,
   Search,
   Clock,
+  LayoutGrid,
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
@@ -163,18 +161,18 @@ export default function Dashboard() {
           </div>
         ) : (
           <>
-            {/* Top Bar: Search + Refresh Indicator */}
+            {/* Top Bar: Search + Refresh Indicator — full-width on mobile */}
             <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-              <div className="relative flex-1 max-w-md">
+              <div className="relative w-full sm:max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search stories by headline, summary, or sector..."
+                  placeholder="Search stories, sectors, topics..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 h-10 text-sm"
+                  className="pl-9 h-10 text-sm w-full"
                 />
               </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0 self-end sm:self-auto">
                 <Clock className="h-3.5 w-3.5" />
                 <span>Updated {relativeTime(lastFetchedAt)}</span>
               </div>
@@ -184,7 +182,7 @@ export default function Dashboard() {
             {trendingData.length > 0 && (
               <div className="animate-fade-in">
                 <div className="flex items-center gap-2 mb-3">
-                  <TrendingUp className="h-4 w-4 text-primary" />
+                  <TrendingUp className="h-4 w-4 text-primary shrink-0" />
                   <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
                     Trending Now
                   </span>
@@ -199,7 +197,9 @@ export default function Dashboard() {
                       <span className="text-[10px] font-bold text-primary/60">
                         {String.fromCharCode(65 + i)}
                       </span>
-                      {item.title.length > 40 ? item.title.slice(0, 40) + "…" : item.title}
+                      <span className="truncate max-w-[140px] sm:max-w-[200px]">
+                        {item.title.length > 40 ? item.title.slice(0, 40) + "…" : item.title}
+                      </span>
                     </span>
                   ))}
                 </div>
@@ -219,32 +219,30 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Big Story */}
-            {filteredStories[0] && <BigStory story={filteredStories[0]} />}
+            {/* ── SECTOR INTELLIGENCE (moved to the top) ── */}
+            <div className="animate-fade-in">
+              {/* Section label */}
+              <div className="flex items-center gap-2 mb-4">
+                <LayoutGrid className="h-4 w-4 text-primary" />
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
+                  Sectors
+                </span>
+                <div className="h-px flex-1 bg-border/60" />
+              </div>
 
-            {/* Markets Dashboard */}
-            <MarketDashboard />
+              {/* Sector Heatmap — visual overview with color-coded intensity */}
+              <SectorHeatmap sectorGroups={sectorGroups} activeSectors={activeSectors} />
 
-            {/* Sector Heatmap — visual overview with color-coded intensity */}
-            <SectorHeatmap sectorGroups={sectorGroups} activeSectors={activeSectors} />
-
-            {/* Sector Navigation */}
-            <Card className="border-border/50">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Globe className="h-5 w-5" />
-                  Sector Intelligence
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-                  {activeSectors.map((sector) => (
+              {/* Sector Navigation Cards */}
+              {activeSectors.length > 0 && (
+                <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3">
+                  {activeSectors.map((sector, i) => (
                     <Link
                       key={sector}
                       href={`/sectors/${sector.toLowerCase()}`}
-                      className="group relative overflow-hidden rounded-xl border border-border/50 bg-card p-4 transition-all duration-300 hover:shadow-lg hover:border-primary/30 hover:-translate-y-0.5"
+                      className={`group relative overflow-hidden rounded-xl border border-border/50 bg-card p-3 sm:p-4 transition-all duration-300 hover:shadow-lg hover:border-primary/30 hover:-translate-y-0.5 animate-fade-in stagger-${Math.min(i + 1, 6)}`}
                     >
-                      <p className="text-2xl mb-1">
+                      <p className="text-xl sm:text-2xl mb-1">
                         {sector === "Markets" && "📊"}
                         {sector === "Tech" && "💻"}
                         {sector === "Geopolitics" && "🌍"}
@@ -252,37 +250,59 @@ export default function Dashboard() {
                         {sector === "India" && "🇮🇳"}
                         {sector === "General" && "📰"}
                       </p>
-                      <p className="font-semibold text-sm group-hover:text-primary transition-colors">
+                      <p className="font-semibold text-xs sm:text-sm group-hover:text-primary transition-colors">
                         {sector}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">
                         {sectorGroups[sector]?.length || 0} stories
                       </p>
                     </Link>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              )}
+            </div>
 
             {/* Intelligence Feed */}
-            <TopStories stories={filteredStories.slice(1, 7)} />
+            {filteredStories[0] && (
+              <div className="animate-fade-in">
+                <div className="flex items-center gap-2 mb-4">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
+                    Top Story
+                  </span>
+                  <div className="h-px flex-1 bg-border/60" />
+                </div>
+                <BigStory story={filteredStories[0]} />
+              </div>
+            )}
+
+            {/* More Stories */}
+            {filteredStories.length > 1 && (
+              <div className="animate-fade-in">
+                <TopStories stories={filteredStories.slice(1, 7)} />
+              </div>
+            )}
 
             {/* Sector Breakdown */}
-            <SectorSection stories={filteredStories} />
+            {filteredStories.length > 0 && (
+              <div className="animate-fade-in">
+                <SectorSection stories={filteredStories} />
+              </div>
+            )}
 
             {/* Export Buttons */}
-            <div className="flex flex-wrap gap-3 justify-center pt-4 border-t border-border/50">
-              <Button variant="outline" size="sm" onClick={() => { downloadMarkdown().catch(() => toast.error("Failed to download Markdown brief")); }}>
-                <FileText className="h-4 w-4 mr-2" />
-                Export Markdown Brief
+            <div className="flex flex-wrap gap-2 sm:gap-3 justify-center pt-4 border-t border-border/50">
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={() => { downloadMarkdown().catch(() => toast.error("Failed to download Markdown brief")); }}>
+                <FileText className="h-4 w-4 mr-1.5 sm:mr-2" />
+                <span className="hidden sm:inline">Export </span>Markdown
               </Button>
-              <Button variant="outline" size="sm" onClick={() => { downloadJson().catch(() => toast.error("Failed to download JSON export")); }}>
-                <Download className="h-4 w-4 mr-2" />
-                Export JSON
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={() => { downloadJson().catch(() => toast.error("Failed to download JSON export")); }}>
+                <Download className="h-4 w-4 mr-1.5 sm:mr-2" />
+                <span className="hidden sm:inline">Export </span>JSON
               </Button>
-              <Button variant="outline" size="sm" onClick={() => { downloadPdf().catch(() => toast.error("Failed to download PDF briefing")); }}>
-                <FileDown className="h-4 w-4 mr-2" />
-                Export PDF
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={() => { downloadPdf().catch(() => toast.error("Failed to download PDF briefing")); }}>
+                <FileDown className="h-4 w-4 mr-1.5 sm:mr-2" />
+                <span className="hidden sm:inline">Export </span>PDF
               </Button>
             </div>
           </>
