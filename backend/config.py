@@ -4,8 +4,8 @@ RSS feeds (with sector tags), constants, and topic templates.
 
 Each RSS source can be tagged with one or more sectors:
   - Articles inherit these sectors automatically (primary classification)
-  - TF-IDF classification runs as a secondary refinement for multi-sector
-  - Empty list means TF-IDF is the sole classifier (fallback)
+  - Keyword matching validates/extends sectors based on article content
+  - Empty list means keyword matching is the sole classifier (fallback)
 """
 
 # ──────────────────────────────────────────────
@@ -39,6 +39,10 @@ RSS_SOURCES = [
     {"name": "NPR News", "url": "https://feeds.npr.org/1001/rss.xml", "sectors": ["Geopolitics", "General"]},
     {"name": "CBS News World", "url": "https://www.cbsnews.com/latest/rss/world", "sectors": ["Geopolitics"]},
     {"name": "Defense News", "url": "https://www.defensenews.com/arc/outboundfeeds/rss/", "sectors": ["Geopolitics"]},
+    {"name": "Foreign Affairs", "url": "https://www.foreignaffairs.com/rss.xml", "sectors": ["Geopolitics"]},
+    {"name": "NPR World", "url": "https://feeds.npr.org/1004/rss.xml", "sectors": ["Geopolitics"]},
+    {"name": "The Intercept", "url": "https://theintercept.com/feed/?lang=en", "sectors": ["Geopolitics"]},
+    {"name": "Stratfor Worldview", "url": "https://worldview.stratfor.com/rss.xml", "sectors": ["Geopolitics"]},
 
     # ── Markets & Business ──
     {"name": "NYTimes Business", "url": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml", "sectors": ["Markets"]},
@@ -52,6 +56,11 @@ RSS_SOURCES = [
     {"name": "Economic Times", "url": "https://economictimes.indiatimes.com/rssfeedstopstories.cms", "sectors": ["Markets", "India"]},
     {"name": "Business Standard", "url": "https://www.business-standard.com/rss/home_page_top_stories.rss", "sectors": ["Markets", "India"]},
     {"name": "Moneycontrol", "url": "https://www.moneycontrol.com/rss/latestnews.xml", "sectors": ["Markets", "India"]},
+    {"name": "Bloomberg Markets", "url": "https://feeds.bloomberg.com/markets/news.rss", "sectors": ["Markets"]},
+    {"name": "Yahoo Finance", "url": "https://finance.yahoo.com/news/rssindex", "sectors": ["Markets"]},
+    {"name": "Financial Times", "url": "https://www.ft.com/rss/home", "sectors": ["Markets"]},
+    {"name": "Fortune", "url": "https://fortune.com/feed/", "sectors": ["Markets"]},
+    {"name": "Seeking Alpha", "url": "https://seekingalpha.com/feed.xml", "sectors": ["Markets"]},
 
     # ── Tech ──
     {"name": "BBC Technology", "url": "https://feeds.bbci.co.uk/news/technology/rss.xml", "sectors": ["Tech"]},
@@ -63,6 +72,11 @@ RSS_SOURCES = [
     {"name": "Ars Technica", "url": "http://feeds.arstechnica.com/arstechnica/index", "sectors": ["Tech"]},
     {"name": "VentureBeat", "url": "https://venturebeat.com/feed/", "sectors": ["Tech"]},
     {"name": "Artificial Intelligence News", "url": "https://www.artificialintelligence-news.com/feed/", "sectors": ["Tech"]},
+    {"name": "MIT Technology Review", "url": "https://www.technologyreview.com/feed/", "sectors": ["Tech"]},
+    {"name": "The Next Web", "url": "https://thenextweb.com/feed/", "sectors": ["Tech"]},
+    {"name": "CNET", "url": "https://www.cnet.com/rss/news/", "sectors": ["Tech"]},
+    {"name": "Engadget", "url": "https://www.engadget.com/rss.xml", "sectors": ["Tech"]},
+    {"name": "ZDNet", "url": "https://www.zdnet.com/news/rss.xml", "sectors": ["Tech"]},
 
     # ── India ──
     {"name": "Times of India", "url": "https://timesofindia.indiatimes.com/rss/4719148.cms", "sectors": ["India"]},
@@ -70,6 +84,8 @@ RSS_SOURCES = [
     {"name": "NDTV", "url": "https://feeds.feedburner.com/ndtvnews-top-stories", "sectors": ["India"]},
     {"name": "Indian Express", "url": "https://indianexpress.com/section/india/feed/", "sectors": ["India"]},
     {"name": "Zee News", "url": "https://zeenews.india.com/rss/india-national-news.xml", "sectors": ["India"]},
+    {"name": "Hindustan Times", "url": "https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml", "sectors": ["India"]},
+    {"name": "Deccan Herald", "url": "https://www.deccanherald.com/feed", "sectors": ["India"]},
 
     # ── Energy ──
     {"name": "CleanTechnica", "url": "https://cleantechnica.com/feed/", "sectors": ["Energy", "Tech"]},
@@ -78,8 +94,10 @@ RSS_SOURCES = [
     {"name": "Utility Dive", "url": "https://www.utilitydive.com/feeds/news/", "sectors": ["Energy"]},
     {"name": "Hydrogen Fuel News", "url": "https://www.hydrogenfuelnews.com/feed/", "sectors": ["Energy"]},
     {"name": "ET EnergyWorld", "url": "https://energy.economictimes.indiatimes.com/rss/topstories", "sectors": ["Energy", "India"]},
+    {"name": "Power Magazine", "url": "https://www.powermag.com/feed/", "sectors": ["Energy"]},
+    {"name": "Energy Storage News", "url": "https://www.energy-storage.news/feed/", "sectors": ["Energy", "Tech"]},
 
-    # ── General / Fallback (use TF-IDF) ──
+    # ── General / Fallback ──
     {"name": "The Guardian Tech", "url": "https://www.theguardian.com/uk/technology/rss", "sectors": ["Tech"]},
 ]
 
