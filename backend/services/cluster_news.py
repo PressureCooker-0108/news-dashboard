@@ -116,7 +116,7 @@ def cluster_articles(articles: list[dict]) -> list[list[dict]]:
             embeddings = np.concatenate([embeddings, topic_onehot * 0.3], axis=1)
 
         # 5. HDBSCAN clustering (tuned for speed with TF-IDF vectors)
-        min_cluster_size = max(2, len(articles) // 20)
+        min_cluster_size = max(2, len(articles) // 30)
         clusterer = HDBSCAN(
             min_cluster_size=min_cluster_size,
             min_samples=2,              # 1 → 2: reduces noise-processing overhead

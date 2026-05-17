@@ -53,6 +53,27 @@ def _extract_image_url(entry) -> str | None:
         if match:
             return match.group(1)
 
+    # Fallback: check entry.content for embedded images (some feeds put
+    # full HTML content here instead of summary)
+    content_list = entry.get("content", [])
+    if content_list and isinstance(content_list, list):
+        for content_item in content_list:
+            value = content_item.get("value", "")
+            if value:
+                match = _IMG_SRC_RE.search(value)
+                if match:
+                    return match.group(1)
+
+    # Fallback: check links for enclosure-type images (podcasts, ESPN, etc.)
+    links = entry.get("links", [])
+    if links and isinstance(links, list):
+        for link in links:
+            rel = link.get("rel", "")
+            href = link.get("href", "")
+            media_type = link.get("type", "")
+            if rel == "enclosure" and href and media_type.startswith("image/"):
+                return href
+
     return None
 
 

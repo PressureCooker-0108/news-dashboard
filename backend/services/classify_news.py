@@ -20,7 +20,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # ── Valid sectors ────────────────────────────
-VALID_SECTORS = ["Markets", "Tech", "Geopolitics", "Energy", "India", "General"]
+VALID_SECTORS = ["Markets", "Tech", "Geopolitics", "Energy", "India", "Sports", "General"]
 
 # ── In-memory classification cache ───────────
 _classification_cache: dict[str, list[str]] = {}
@@ -293,6 +293,27 @@ SECTOR_KEYWORDS: dict[str, list[str]] = {
         "minimum support price", "msp",
         "farm law",
     ],
+    "Sports": [
+        # Team sports & competitions
+        "football", "soccer", "basketball", "tennis",
+        "golf", "baseball", "hockey", "cricket",
+        "formula one", "f1",
+        # Leagues
+        "nfl", "nba", "mlb", "nhl", "epl",
+        "league", "championship", "tournament",
+        "olympic", "world cup",
+        "premier league", "champions league",
+        "super bowl", "world series", "stanley cup",
+        # General sports
+        "sport", "sports",
+        "game", "match", "player", "team",
+        "coach", "manager", "captain",
+        "athlete", "athletics",
+        "stadium", "arena",
+        "season", "playoff", "final",
+        "goal", "touchdown", "score",
+        "sports news", "sports industry",
+    ],
     "General": [
         # Entertainment (movies, TV)
         "movie", "film", "cinema",
@@ -306,16 +327,7 @@ SECTOR_KEYWORDS: dict[str, list[str]] = {
         "celebrity", "star",
         "audition", "casting",
         "director", "producer", "screenplay",
-        # Sports
-        "sport", "sports",
-        "game", "match", "player", "team",
-        "coach", "manager",
-        "league", "championship", "tournament",
-        "olympic", "world cup",
-        "football", "soccer", "basketball", "tennis",
-        "golf", "baseball", "hockey", "cricket",
-        "formula one", "f1",
-        "nfl", "nba", "mlb", "nhl", "epl",
+
         # Health
         "health", "healthcare", "hospital",
         "doctor", "patient", "disease",

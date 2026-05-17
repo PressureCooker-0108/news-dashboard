@@ -124,8 +124,12 @@ def save_articles(articles_data: list[dict], db: Session | None = None) -> int:
                 inserted += 1
             else:
                 # Article already exists — update fetched_at so the next
-                # pipeline run's get_recent_articles(hours=24) can find it.
+                # pipeline run's get_recent_articles(hours=24) can find it,
+                # and backfill image_url if we now have one (feeds sometimes
+                # add images after initial publication or we improved extraction).
                 exists.fetched_at = now
+                if a.get("image_url"):
+                    exists.image_url = a["image_url"]
         if own_session:
             db.commit()
     except Exception as e:

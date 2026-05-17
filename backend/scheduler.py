@@ -92,7 +92,7 @@ def run_pipeline() -> None:
             # Limit articles to prevent OOM on Render's free tier (512 MB RAM)
             # Now that classification uses source-assigned sectors, we can increase
             # the limit — more articles means better sector coverage per source.
-            MAX_ARTICLES = 500
+            MAX_ARTICLES = 1000
             if len(recent) > MAX_ARTICLES:
                 logger.info(f"Limiting to {MAX_ARTICLES} articles for clustering (had {len(recent)})")
                 recent = recent[:MAX_ARTICLES]

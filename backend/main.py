@@ -76,7 +76,7 @@ _news_cache: dict = {}
 _news_cache_ts: float = 0
 _CACHE_TTL = 300  # seconds (data refreshes every 6 hours)
 
-_SECTORS = ["All", "Markets", "Tech", "Geopolitics", "Energy", "India", "General"]
+_SECTORS = ["All", "Markets", "Tech", "Geopolitics", "Energy", "India", "Sports", "General"]
 
 
 # ── Rate Limiter ──
