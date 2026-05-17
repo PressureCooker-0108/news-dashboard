@@ -1,6 +1,7 @@
 import { Story, MarketDataPoint, SectorSummary, SourceDiversity, Briefing } from "@/types/story"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8001"
+// Default points to production (Render). For local dev, set NEXT_PUBLIC_API_URL=http://127.0.0.1:8001
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://news-dashboard-will.onrender.com"
 
 export async function fetchStories(): Promise<Story[]> {
   try {

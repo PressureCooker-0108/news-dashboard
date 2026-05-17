@@ -15,7 +15,7 @@ services:
         sync: false  # Optional — set this to lock down POST endpoints.
                       #    Generate with: openssl rand -hex 32
       - key: CORS_ORIGINS
-        value: "https://your-frontend.vercel.app"  # ⚠️ Change to your actual frontend URL
+        value: "https://news-dashboard-wheat-eight.vercel.app"  # ⚠️ Change to your actual frontend URL
       - key: LOG_LEVEL
         value: "INFO"
     healthCheckPath: /
